@@ -1,0 +1,261 @@
+{
+  "corpus": "kb-bulk",
+  "docs": [
+    {
+      "id": "doc-1",
+      "preview": "Bound document 1: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-2",
+      "preview": "Bound document 2: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-3",
+      "preview": "Bound document 3: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-4",
+      "preview": "Bound document 4: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-5",
+      "preview": "Bound document 5: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-6",
+      "preview": "Bound document 6: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-7",
+      "preview": "Bound document 7: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-8",
+      "preview": "Bound document 8: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-9",
+      "preview": "Bound document 9: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-10",
+      "preview": "Bound document 10: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-11",
+      "preview": "Bound document 11: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-12",
+      "preview": "Bound document 12: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-13",
+      "preview": "Bound document 13: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-14",
+      "preview": "Bound document 14: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-15",
+      "preview": "Bound document 15: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-16",
+      "preview": "Bound document 16: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-17",
+      "preview": "Bound document 17: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-18",
+      "preview": "Bound document 18: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-19",
+      "preview": "Bound document 19: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-20",
+      "preview": "Bound document 20: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-21",
+      "preview": "Bound document 21: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-22",
+      "preview": "Bound document 22: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-23",
+      "preview": "Bound document 23: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-24",
+      "preview": "Bound document 24: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-25",
+      "preview": "Bound document 25: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-26",
+      "preview": "Bound document 26: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-27",
+      "preview": "Bound document 27: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-28",
+      "preview": "Bound document 28: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-29",
+      "preview": "Bound document 29: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-30",
+      "preview": "Bound document 30: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-31",
+      "preview": "Bound document 31: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-32",
+      "preview": "Bound document 32: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-33",
+      "preview": "Bound document 33: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-34",
+      "preview": "Bound document 34: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-35",
+      "preview": "Bound document 35: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-36",
+      "preview": "Bound document 36: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-37",
+      "preview": "Bound document 37: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-38",
+      "preview": "Bound document 38: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-39",
+      "preview": "Bound document 39: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-40",
+      "preview": "Bound document 40: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-41",
+      "preview": "Bound document 41: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-42",
+      "preview": "Bound document 42: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-43",
+      "preview": "Bound document 43: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-44",
+      "preview": "Bound document 44: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-45",
+      "preview": "Bound document 45: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-46",
+      "preview": "Bound document 46: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-47",
+      "preview": "Bound document 47: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-48",
+      "preview": "Bound document 48: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-49",
+      "preview": "Bound document 49: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-50",
+      "preview": "Bound document 50: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-51",
+      "preview": "Bound document 51: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-52",
+      "preview": "Bound document 52: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-53",
+      "preview": "Bound document 53: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-54",
+      "preview": "Bound document 54: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-55",
+      "preview": "Bound document 55: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-56",
+      "preview": "Bound document 56: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-57",
+      "preview": "Bound document 57: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-58",
+      "preview": "Bound document 58: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-59",
+      "preview": "Bound document 59: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-60",
+      "preview": "Bound document 60: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-61",
+      "preview": "Bound document 61: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-62",
+      "preview": "Bound document 62: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-63",
+      "preview": "Bound document 63: the quarterly revenue figure is 12.4M."
+    },
+    {
+      "id": "doc-64",
+      "preview": "Bound document 64: the quarterly revenue figure is 12.4M."
+    }
+  ]
+}

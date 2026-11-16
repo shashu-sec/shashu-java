@@ -1,0 +1,7 @@
+# Working copies stay LF on every OS, including Windows with core.autocrlf=true.
+* text=auto eol=lf
+
+# The vendored contract is a byte-for-byte copy of the gateway repo's file.
+# `-text` turns conversion off for this path, so the working copy is what
+# was committed.
+contracts/** -text

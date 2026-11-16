@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Justified suppressions for DTO / fail-open JSON parse / deprecated alias. -->
+<FindBugsFilter>
+  <!-- Jackson parse: catch Exception because ObjectMapper throws several checked/unchecked types. -->
+  <Match><Bug pattern="REC_CATCH_EXCEPTION"/></Match>
+  <!-- Public DTOs return/store maps and lists; copying every accessor would change the wire types. -->
+  <Match><Bug pattern="EI_EXPOSE_REP"/></Match>
+  <Match><Bug pattern="EI_EXPOSE_REP2"/></Match>
+  <!-- Constructors throw on missing config; finalizer attacks do not apply to these stateless clients. -->
+  <Match><Bug pattern="CT_CONSTRUCTOR_THROW"/></Match>
+  <!-- Protocol tokens are ASCII; Locale.ROOT would not change them. -->
+  <Match><Bug pattern="DM_CONVERT_CASE"/></Match>
+  <!-- Deprecated patching alias must keep the old simple name. -->
+  <Match><Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/></Match>
+  <!-- Response.body() is nullable in the OkHttp signature; the call already failed if it is null. -->
+  <Match><Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/></Match>
+  <Match><Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/></Match>
+  <!-- Empty retrieval summary is "nothing declared", which is null by contract. -->
+  <Match><Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/></Match>
+  <!-- Best-effort env parse; a bad OS name must not fail construction. -->
+  <Match><Bug pattern="DE_MIGHT_IGNORE"/></Match>
+  <!-- Jackson extra-fields setter kept for deserializer compatibility. -->
+  <Match><Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/></Match>
+</FindBugsFilter>

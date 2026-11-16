@@ -1,0 +1,20 @@
+{
+  "corpus": "kb-handbook",
+  "docs": [
+    {
+      "id": "doc-1",
+      "preview": "Bound document 1: the quarterly revenue figure is 12.4M."
+    }
+  ],
+  "stages": [
+    {
+      "name": "rerank_candidates",
+      "docs": [
+        {
+          "id": "cand-9",
+          "preview": "DISCARDED CANDIDATE: the CEO severance package is 4.2M."
+        }
+      ]
+    }
+  ]
+}

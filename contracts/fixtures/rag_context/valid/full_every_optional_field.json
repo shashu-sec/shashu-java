@@ -1,0 +1,15 @@
+{
+  "v": 1,
+  "corpus": "kb-handbook",
+  "query": "what was Q3 revenue?",
+  "source": "langchain",
+  "docs": [
+    {
+      "id": "doc-1",
+      "preview": "Bound document 1: the quarterly revenue figure is 12.4M.",
+      "score": 0.8123,
+      "source_uri": "s3://kb-handbook/finance/q3.md",
+      "hash": "9f86d081884c7d65"
+    }
+  ]
+}

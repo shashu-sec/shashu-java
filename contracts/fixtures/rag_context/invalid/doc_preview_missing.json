@@ -1,0 +1,9 @@
+{
+  "corpus": "kb-handbook",
+  "docs": [
+    {
+      "id": "doc-1",
+      "source_uri": "s3://kb-handbook/finance/q3.md"
+    }
+  ]
+}

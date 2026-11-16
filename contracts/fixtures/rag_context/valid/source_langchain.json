@@ -1,0 +1,10 @@
+{
+  "corpus": "kb-handbook",
+  "source": "langchain",
+  "docs": [
+    {
+      "id": "doc-1",
+      "preview": "Bound document 1: the quarterly revenue figure is 12.4M."
+    }
+  ]
+}
