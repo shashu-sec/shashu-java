@@ -72,9 +72,9 @@ foreach ($j in $homes) {
 }
 
 Write-Host "== jar contents =="
-$jar = Join-Path $Root "target\shashu-sdk-1.1.0.jar"
-$src = Join-Path $Root "target\shashu-sdk-1.1.0-sources.jar"
-$jdoc = Join-Path $Root "target\shashu-sdk-1.1.0-javadoc.jar"
+$jar = Join-Path $Root "target\shashu-sdk-1.1.1.jar"
+$src = Join-Path $Root "target\shashu-sdk-1.1.1-sources.jar"
+$jdoc = Join-Path $Root "target\shashu-sdk-1.1.1-javadoc.jar"
 foreach ($p in @($jar, $src, $jdoc)) {
     if (-not (Test-Path $p)) { throw "missing $p" }
 }

@@ -15,7 +15,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
- * Live SHASHU proof. Skipped unless {@code SHASHU_E2E_BASE_URL} is set (throwaway stack).
+ * Live SHASHU proof. Skipped unless {@code SHASHU_E2E_BASE_URL} is set — typically by {@code
+ * _internal/identity-i4-i5/e2e_real_stack.py} after it boots the throwaway stack.
  */
 @Tag("e2e")
 class IdentityE2ETest {

@@ -162,6 +162,31 @@ class Sdk11WireTest {
   }
 
   @Test
+  void busy_retry_resends_the_same_built_request_including_declaration() throws Exception {
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(503)
+            .setHeader("Retry-After", "0")
+            .setHeader("x-should-retry", "true")
+            .setBody(
+                "{\"error\":{\"message\":\"" + BUSY_SENTENCE + "\",\"code\":\"gateway_busy\"}}"));
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "application/json")
+            .setBody(okBody(null)));
+    Retrieval.declareRetrieval(java.util.List.of("CANARY-retry"), "policy_docs_v2", "backups");
+    try (ShashuClient client = builder().maxRetries(2).build()) {
+      client.chat().completions().create(req(null));
+    }
+    String firstBody = server.takeRequest().getBody().readUtf8();
+    String retryBody = server.takeRequest().getBody().readUtf8();
+    assertEquals(firstBody, retryBody);
+    assertTrue(firstBody.contains("CANARY-retry"));
+    assertTrue(firstBody.contains("policy_docs_v2"));
+  }
+
+  @Test
   void f_busy_retry_waits_then_succeeds() throws Exception {
     server.enqueue(
         new MockResponse()
@@ -201,7 +226,7 @@ class Sdk11WireTest {
           assertThrows(ShashuException.class, () -> client.chat().completions().create(req(null)));
       assertEquals(BUSY_SENTENCE, ex.getMessage());
     }
-    assertTrue(server.getRequestCount() >= 3);
+    assertEquals(3, server.getRequestCount());
   }
 
   @Test
@@ -231,7 +256,6 @@ class Sdk11WireTest {
     try (ShashuClient client = builder().maxRetries(0).build()) {
       assertThrows(ShashuException.class, () -> client.chat().completions().create(req(null)));
     }
-    assertTrue(server.getRequestCount() >= 1);
-    assertTrue(server.getRequestCount() <= 2);
+    assertEquals(1, server.getRequestCount());
   }
 }

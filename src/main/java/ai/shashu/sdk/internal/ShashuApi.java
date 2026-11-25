@@ -21,11 +21,13 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import okhttp3.Headers;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
 
 /**
  * Internal HTTP plumbing shared by all resource classes. Centralises retry policy, JSON
@@ -100,8 +102,44 @@ public final class ShashuApi {
 
   private OkHttpClient withCredential(OkHttpClient http) {
     return http.newBuilder()
+        .addNetworkInterceptor(SuppressOkHttpBusyFollowUp.INSTANCE)
         .addInterceptor(new CredentialInterceptor(options.credential()))
         .build();
+  }
+
+  /**
+   * OkHttp's {@code RetryAndFollowUpInterceptor} immediately replays a 503 when {@code Retry-After}
+   * is {@code 0}. That extra hop stacks on {@link #post}'s busy-retry loop (max_retries=0 → 2
+   * requests; give-up → 6). Strip only the zero-delay header from the in-memory response so OkHttp
+   * does not follow up; keep the invitation and the delay for this SDK via {@link
+   * #SUPPRESSED_RETRY_AFTER}.
+   */
+  static final String SUPPRESSED_RETRY_AFTER = "OkHttp-Suppressed-Retry-After";
+
+  static final class SuppressOkHttpBusyFollowUp implements Interceptor {
+    static final SuppressOkHttpBusyFollowUp INSTANCE = new SuppressOkHttpBusyFollowUp();
+
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+      Response response = chain.proceed(chain.request());
+      if (response.code() != 503) {
+        return response;
+      }
+      String retryAfter = response.header("Retry-After");
+      Long millis = parseRetryAfterMillis(retryAfter);
+      if (millis == null || millis != 0L) {
+        return response;
+      }
+      Response.Builder builder =
+          response
+              .newBuilder()
+              .removeHeader("Retry-After")
+              .header(SUPPRESSED_RETRY_AFTER, retryAfter);
+      if (response.header("x-should-retry") == null) {
+        builder.header("x-should-retry", "true");
+      }
+      return builder.build();
+    }
   }
 
   /**
@@ -139,6 +177,26 @@ public final class ShashuApi {
     }
   }
 
+  /** Join declareRetrieval onto the payload ONCE, before the retry loop re-sends it. */
+  private byte[] joinDeclarationOnce(String url, byte[] payload) {
+    Request probe = new Request.Builder().url(url).post(RequestBody.create(payload, JSON)).build();
+    Request joined = RetrievalJoiner.join(probe);
+    if (joined == probe) {
+      return payload;
+    }
+    RequestBody body = joined.body();
+    if (body == null) {
+      return payload;
+    }
+    try {
+      Buffer buf = new Buffer();
+      body.writeTo(buf);
+      return buf.readByteArray();
+    } catch (IOException e) {
+      return payload;
+    }
+  }
+
   public <Req, Resp> Resp post(String path, Req body, Class<Resp> responseType) {
     return post(path, body, responseType, null);
   }
@@ -151,25 +209,28 @@ public final class ShashuApi {
     } catch (IOException e) {
       throw new ShashuException("Failed to serialise request body", e);
     }
+    payload = joinDeclarationOnce(url, payload);
+    RequestBody frozenBody = RequestBody.create(payload, JSON);
+    Request.Builder proto =
+        new Request.Builder()
+            .url(url)
+            .header("User-Agent", options.userAgent())
+            .header("Content-Type", "application/json")
+            .post(frozenBody);
+    if (options.organizationId() != null && !options.organizationId().isBlank()) {
+      proto.header("X-Org-Id", options.organizationId());
+    }
+    applyContractVersion(proto);
+    applyWorkflowContext(proto, sessionId);
+    Request frozen = proto.build();
 
     int attempt = 0;
     while (true) {
-      Request.Builder req =
-          new Request.Builder()
-              .url(url)
-              .header("User-Agent", options.userAgent())
-              .header("Content-Type", "application/json")
-              .post(RequestBody.create(payload, JSON));
-      if (options.organizationId() != null && !options.organizationId().isBlank()) {
-        req.header("X-Org-Id", options.organizationId());
-      }
-      applyContractVersion(req);
-      applyWorkflowContext(req, sessionId);
 
       // Delay to wait before the NEXT attempt. Assigned on every path
       // that falls through to the retry, then consumed below.
       long delayMillis;
-      try (Response response = http.newCall(req.build()).execute()) {
+      try (Response response = http.newCall(frozen.newBuilder().build()).execute()) {
         // Cache self-id from EVERY response (incl. non-2xx) before any throw, so a
         // blocked response still seeds caller-agent-id for the next A2A invocation.
         captureAgentId(response);
@@ -205,7 +266,9 @@ public final class ShashuApi {
         boolean is5xx = status >= 500 && status < 600;
         boolean invited =
             truthy(response.header("x-should-retry"))
-                || parseRetryAfterMillis(response.header("Retry-After")) != null;
+                || parseRetryAfterMillis(
+                        firstHeader(response, "Retry-After", SUPPRESSED_RETRY_AFTER))
+                    != null;
         boolean busy = (status == 429 || status == 503) && invited;
         boolean retryable = busy || (options.legacyRetryPolicy() && is5xx && status != 503);
         if (options.maxRetries() <= 0 || !retryable || attempt >= options.maxRetries()) {
@@ -214,7 +277,8 @@ public final class ShashuApi {
 
         Long retryAfterMillis =
             (busy && !options.legacyRetryPolicy())
-                ? parseRetryAfterMillis(response.header("Retry-After"))
+                ? parseRetryAfterMillis(
+                    firstHeader(response, "Retry-After", SUPPRESSED_RETRY_AFTER))
                 : null;
         delayMillis =
             withJitter(retryAfterMillis != null ? retryAfterMillis : backoffMillis(attempt));
@@ -241,6 +305,16 @@ public final class ShashuApi {
   /** Exponential backoff with jitter: 250ms, 500ms, 1s, capped at 2s. */
   private static long backoffMillis(int attempt) {
     return Math.min(2000L, 250L * (1L << attempt)) + ThreadLocalRandom.current().nextLong(0, 100);
+  }
+
+  private static String firstHeader(Response response, String... names) {
+    for (String name : names) {
+      String value = response.header(name);
+      if (value != null && !value.isBlank()) {
+        return value;
+      }
+    }
+    return null;
   }
 
   private static boolean truthy(String value) {

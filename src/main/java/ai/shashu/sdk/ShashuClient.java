@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 public final class ShashuClient implements AutoCloseable {
 
   /** Stamped into the User-Agent. Bump in sync with pom.xml &lt;version&gt;. */
-  public static final String SDK_VERSION = "1.1.0";
+  public static final String SDK_VERSION = "1.1.1";
 
   /**
    * The contract version this SDK declares on every request, as the {@code shashu-version} header.

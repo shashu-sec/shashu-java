@@ -10,6 +10,7 @@ import java.util.Set;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -188,10 +189,23 @@ public class ShashuRoutingInterceptor implements Interceptor {
 
     Request rewritten = rewrite(original, url);
 
-    // The retrieval joiner runs LAST, on the already-rewritten request,
-    // so it only ever sees traffic that is actually going to the gateway.
-    // With nothing declared it returns `rewritten` itself, untouched.
-    Response response = chain.proceed(RetrievalJoiner.join(rewritten));
+    // Join once, freeze the body bytes, then every proceed (including the
+    // pass_expired retry) re-sends that body. Authorization may change.
+    // Do not invent a JSON body on GET, and keep the original Content-Type
+    // when nothing was joined (byte-identical empty-bus path).
+    Request joined = RetrievalJoiner.join(rewritten);
+    RequestBody origBody = joined.body();
+    byte[] frozenPayload = origBody == null ? new byte[0] : bodyBytes(joined);
+    okhttp3.MediaType mediaType = origBody == null ? null : origBody.contentType();
+    Request frozen = joined;
+    if (origBody != null && joined != rewritten) {
+      frozen =
+          joined
+              .newBuilder()
+              .method(joined.method(), RequestBody.create(frozenPayload, mediaType))
+              .build();
+    }
+    Response response = chain.proceed(frozen);
     if (!credential.usesProvider()) {
       return response;
     }
@@ -214,7 +228,28 @@ public class ShashuRoutingInterceptor implements Interceptor {
     response.close();
     credential.invalidate();
     Request retried = rewrite(original, url);
-    return chain.proceed(RetrievalJoiner.join(retried));
+    if (origBody == null) {
+      return chain.proceed(retried);
+    }
+    return chain.proceed(
+        retried
+            .newBuilder()
+            .method(retried.method(), RequestBody.create(frozenPayload, mediaType))
+            .build());
+  }
+
+  private static byte[] bodyBytes(Request request) {
+    RequestBody body = request.body();
+    if (body == null) {
+      return new byte[0];
+    }
+    try {
+      okio.Buffer buf = new okio.Buffer();
+      body.writeTo(buf);
+      return buf.readByteArray();
+    } catch (IOException e) {
+      return new byte[0];
+    }
   }
 
   private Request rewrite(Request original, HttpUrl originalUrl) {
