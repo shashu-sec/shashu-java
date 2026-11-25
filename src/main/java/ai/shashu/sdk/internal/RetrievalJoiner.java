@@ -25,9 +25,9 @@ import okio.Buffer;
  *       nothing declared anywhere it returns <b>the same {@link Request} instance</b> before
  *       touching the request's headers or body at all, so the bytes on the wire are the bytes the
  *       unpatched interceptor produced &mdash; asserted byte-for-byte in the harness.
- *   <li><b>Explicit always wins.</b> A body already carrying {@code trustgate_metadata.rag_context}
- *       is left exactly as the caller built it. The ambient declaration is consumed and discarded,
- *       not deferred: a declaration that lost this call must not turn up on the next one.
+ *   <li><b>Explicit always wins.</b> A body already carrying {@code shashu_metadata.rag_context} is
+ *       left exactly as the caller built it. The ambient declaration is consumed and discarded, not
+ *       deferred: a declaration that lost this call must not turn up on the next one.
  *   <li><b>Snapshot and clear.</b> The bus is emptied the moment it is written to a request.
  *       Retrieval declared for request N never reaches request N+1.
  *   <li><b>Never corrupt a body it does not understand.</b> A non-JSON body, a non-object JSON
@@ -59,7 +59,7 @@ public final class RetrievalJoiner {
 
   /**
    * Return the request to send: either {@code request} itself, or a copy carrying {@code
-   * trustgate_metadata.rag_context}.
+   * shashu_metadata.rag_context}.
    *
    * <p>Never throws. A retrieval declaration must not be the thing that breaks a customer's
    * request.
@@ -129,7 +129,7 @@ public final class RetrievalJoiner {
     }
     ObjectNode root = (ObjectNode) parsed;
 
-    JsonNode existing = root.get("trustgate_metadata");
+    JsonNode existing = root.get("shashu_metadata");
     boolean explicitRag =
         existing != null && existing.isObject() && existing.hasNonNull("rag_context");
     boolean explicitMem =
@@ -154,7 +154,7 @@ public final class RetrievalJoiner {
     ObjectNode metadata =
         (existing != null && existing.isObject())
             ? (ObjectNode) existing
-            : root.putObject("trustgate_metadata");
+            : root.putObject("shashu_metadata");
     if (context != null) {
       metadata.set("rag_context", MAPPER.valueToTree(context));
     }

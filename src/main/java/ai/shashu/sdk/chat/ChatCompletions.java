@@ -101,7 +101,7 @@ public final class ChatCompletions {
     warnStreamingInert();
     // Force stream=true so the gateway opens an SSE channel even if the
     // caller forgot to set it. Idempotent if already true. We carry
-    // over rag_context + free-form trustgate_metadata extras since
+    // over rag_context + free-form shashu_metadata extras since
     // they're scanner-critical control-plane fields.
     ChatCompletionRequest.Builder b =
         ChatCompletionRequest.builder()

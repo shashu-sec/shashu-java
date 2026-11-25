@@ -163,7 +163,7 @@ public final class Shashu {
   }
 
   private static boolean carrierPresentButUnreadable(Object err) {
-    if (err instanceof ChatCompletionResponse chat && chat.extraFields().containsKey("trustgate")) {
+    if (err instanceof ChatCompletionResponse chat && chat.extraFields().containsKey("shashu")) {
       return true;
     }
     if (err instanceof ShashuException ex && envelopeObjectPresent(ex.responseBody())) {
@@ -217,7 +217,7 @@ public final class Shashu {
     if (extra == null) {
       return null;
     }
-    JsonNode tg = extra.get("trustgate");
+    JsonNode tg = extra.get("shashu");
     return tg == null ? null : readEnvelope(tg);
   }
 
@@ -230,13 +230,13 @@ public final class Shashu {
   }
 
   private static JsonNode locateEnvelope(JsonNode root) {
-    JsonNode top = root.get("trustgate");
+    JsonNode top = root.get("shashu");
     if (top != null && top.isObject()) {
       return top;
     }
     JsonNode err = root.get("error");
     if (err != null && err.isObject()) {
-      JsonNode nested = err.get("trustgate");
+      JsonNode nested = err.get("shashu");
       if (nested != null && nested.isObject()) {
         return nested;
       }
@@ -294,9 +294,9 @@ public final class Shashu {
       // equalsIgnoreCase, not a lowered copy of every key: it rejects on
       // length before it compares a character, and allocates nothing.
       String k = e.getKey();
-      if ("x-trustgate-decision".equalsIgnoreCase(k)) {
+      if ("x-shashu-decision".equalsIgnoreCase(k)) {
         decision = e.getValue().trim();
-      } else if ("x-trustgate-code".equalsIgnoreCase(k)) {
+      } else if ("x-shashu-code".equalsIgnoreCase(k)) {
         code = e.getValue().trim();
       } else if (DecisionBlocks.HEADER_ATTACHMENTS.equalsIgnoreCase(k)) {
         attachments = e.getValue();

@@ -69,8 +69,8 @@ public class ShashuRoutingInterceptor implements Interceptor {
   private final String contractVersion; // nullable: caller opted out
 
   /**
-   * @param apiKey the Shashu API key. The gateway address comes from {@code TRUSTGATE_BASE_URL};
-   *     there is no default.
+   * @param apiKey the Shashu API key. The gateway address comes from {@code SHASHU_BASE_URL}; there
+   *     is no default.
    * @throws ai.shashu.sdk.ShashuConfigException if no address resolves
    */
   public ShashuRoutingInterceptor(String apiKey) {
@@ -80,8 +80,8 @@ public class ShashuRoutingInterceptor implements Interceptor {
   /**
    * @param apiKey the Shashu API key
    * @param gatewayBaseUrlOverride the gateway address, which always wins; {@code null} falls back
-   *     to {@code TRUSTGATE_BASE_URL}. Shashu is self-hosted, so there is no default and the SDK
-   *     will not guess one.
+   *     to {@code SHASHU_BASE_URL}. Shashu is self-hosted, so there is no default and the SDK will
+   *     not guess one.
    * @param organizationId optional {@code X-Org-Id} scoping
    * @throws ai.shashu.sdk.ShashuConfigException if no address resolves
    */
@@ -93,10 +93,10 @@ public class ShashuRoutingInterceptor implements Interceptor {
   /**
    * @param apiKey the Shashu API key
    * @param gatewayBaseUrlOverride the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   *     SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping
-   * @param contractVersion the {@code trustgate-version} to declare on rerouted requests; {@code
-   *     null} or blank sends none. A value the caller already set on the request is kept.
+   * @param contractVersion the {@code shashu-version} to declare on rerouted requests; {@code null}
+   *     or blank sends none. A value the caller already set on the request is kept.
    * @throws ai.shashu.sdk.ShashuConfigException if no address resolves
    */
   public ShashuRoutingInterceptor(

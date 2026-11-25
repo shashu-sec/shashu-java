@@ -18,9 +18,9 @@ import java.util.Map;
  */
 final class DecisionBlocks {
 
-  static final String HEADER_ATTACHMENTS = "x-trustgate-attachments";
-  static final String HEADER_MEMORY = "x-trustgate-memory";
-  static final String HEADER_INSPECTION = "x-trustgate-inspection";
+  static final String HEADER_ATTACHMENTS = "x-shashu-attachments";
+  static final String HEADER_MEMORY = "x-shashu-memory";
+  static final String HEADER_INSPECTION = "x-shashu-inspection";
 
   private DecisionBlocks() {}
 

@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  *
  * <pre>{@code
  * ShashuClient client = ShashuClient.builder()
- *     .apiKey(System.getenv("TRUSTGATE_API_KEY"))
+ *     .apiKey(System.getenv("SHASHU_API_KEY"))
  *     .build();
  *
  * ChatCompletionResponse resp = client.chat().completions().create(
@@ -34,12 +34,11 @@ import java.util.function.Supplier;
 public final class ShashuClient implements AutoCloseable {
 
   /** Stamped into the User-Agent. Bump in sync with pom.xml &lt;version&gt;. */
-  public static final String SDK_VERSION = "1.0.0";
+  public static final String SDK_VERSION = "1.1.0";
 
   /**
-   * The contract version this SDK declares on every request, as the {@code trustgate-version}
-   * header. The same value the Python SDK sends ({@code
-   * trustgate.context.DEFAULT_CONTRACT_VERSION}).
+   * The contract version this SDK declares on every request, as the {@code shashu-version} header.
+   * The same value the Python SDK sends ({@code trustgate.context.DEFAULT_CONTRACT_VERSION}).
    *
    * <p>Without it the gateway serves its legacy contract: every refusal arrives as an HTTP 200 with
    * the sentence in the message content, and the body carries no {@code trustgate} envelope, so the
@@ -53,7 +52,7 @@ public final class ShashuClient implements AutoCloseable {
   public static final String DEFAULT_CONTRACT_VERSION = "2026-09-01";
 
   /** The request header {@link #DEFAULT_CONTRACT_VERSION} is sent under. */
-  public static final String CONTRACT_VERSION_HEADER = "trustgate-version";
+  public static final String CONTRACT_VERSION_HEADER = "shashu-version";
 
   private final ShashuApi api;
   private final Chat chat;
@@ -81,7 +80,7 @@ public final class ShashuClient implements AutoCloseable {
   /**
    * This agent's own id, as known so far (ADR-007 §4.1) — seeded from {@link
    * ShashuClientOptions#agentId()} and refreshed from each gateway response's {@code
-   * x-trustgate-agent-id} header. Null until known.
+   * x-shashu-agent-id} header. Null until known.
    */
   public String agentId() {
     return api.agentId();
@@ -105,7 +104,7 @@ public final class ShashuClient implements AutoCloseable {
    * ai.shashu.sdk.tracing.Tracer#captureIncoming} on these headers.
    *
    * @throws IllegalStateException if the self-id is not known yet — set the {@code agentId} option
-   *     or make one gateway call first so the {@code x-trustgate-agent-id} response header can seed
+   *     or make one gateway call first so the {@code x-shashu-agent-id} response header can seed
    *     it.
    */
   public Map<String, String> buildInvocationHeaders() {
@@ -122,7 +121,7 @@ public final class ShashuClient implements AutoCloseable {
     if (self == null || self.isBlank()) {
       throw new IllegalStateException(
           "Self agent id is unknown — set ShashuClientOptions agentId or make one "
-              + "gateway call first so the x-trustgate-agent-id response header can seed it.");
+              + "gateway call first so the x-shashu-agent-id response header can seed it.");
     }
     return WorkflowContext.buildInvocationHeaders(self, traceId, sessionId, hopDepth);
   }
@@ -156,7 +155,7 @@ public final class ShashuClient implements AutoCloseable {
 
     private Builder() {}
 
-    /** Required. Falls back to the TRUSTGATE_API_KEY env var if unset. */
+    /** Required. Falls back to the SHASHU_API_KEY env var if unset. */
     public Builder apiKey(String apiKey) {
       this.apiKey = apiKey;
       return this;
@@ -172,7 +171,7 @@ public final class ShashuClient implements AutoCloseable {
     }
 
     /**
-     * The gateway address. Falls back to the {@code TRUSTGATE_BASE_URL} environment variable.
+     * The gateway address. Falls back to the {@code SHASHU_BASE_URL} environment variable.
      *
      * <p>There is <b>no default</b>. Shashu is self-hosted, so the SDK has no address to guess and
      * will not guess one: with neither this nor the environment variable set, {@link #build()}
@@ -225,8 +224,8 @@ public final class ShashuClient implements AutoCloseable {
     /**
      * This agent's own id (ADR-007 §4.1), used as the {@code caller-agent-id} when this agent
      * INVOKES a downstream agent via {@link ShashuClient#buildInvocationHeaders()}. Optional — if
-     * unset, the client caches it from the {@code x-trustgate-agent-id} response header on the
-     * first gateway call. Advisory lineage, never an auth credential.
+     * unset, the client caches it from the {@code x-shashu-agent-id} response header on the first
+     * gateway call. Advisory lineage, never an auth credential.
      */
     public Builder agentId(String agentId) {
       this.agentId = agentId;
@@ -244,11 +243,11 @@ public final class ShashuClient implements AutoCloseable {
     }
 
     /**
-     * The contract version declared on every request, as the {@code trustgate-version} header.
-     * Default {@link ShashuClient#DEFAULT_CONTRACT_VERSION}. Pass another date to pin it, or {@code
-     * null} (or blank) to send no such header and take whatever the account's default already does,
-     * which is the gateway's legacy contract unless an operator has set one: refusals as HTTP 200
-     * replies and no body envelope.
+     * The contract version declared on every request, as the {@code shashu-version} header. Default
+     * {@link ShashuClient#DEFAULT_CONTRACT_VERSION}. Pass another date to pin it, or {@code null}
+     * (or blank) to send no such header and take whatever the account's default already does, which
+     * is the gateway's legacy contract unless an operator has set one: refusals as HTTP 200 replies
+     * and no body envelope.
      */
     public Builder contractVersion(String contractVersion) {
       this.contractVersion = contractVersion;

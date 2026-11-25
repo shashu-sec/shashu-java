@@ -65,7 +65,7 @@ public final class ShashuDecision {
 
   /**
    * What happened to each attached file; null when the request had none. Read off the body; off the
-   * {@code x-trustgate-attachments} counts when the body carried no envelope. {@link
+   * {@code x-shashu-attachments} counts when the body carried no envelope. {@link
    * Attachments#carrier()} says which.
    */
   public Attachments attachments() {
@@ -85,8 +85,8 @@ public final class ShashuDecision {
   /**
    * What the gateway inspected: {@code input}, {@code output}, {@code reason} and a {@code
    * detectors} map of detector name to state (e.g. {@code memory} -> {@code checked} / {@code
-   * partial} / {@code skipped}). Same shape off the body or the {@code x-trustgate-inspection}
-   * header; read-only; states are raw strings. Null when neither carried one.
+   * partial} / {@code skipped}). Same shape off the body or the {@code x-shashu-inspection} header;
+   * read-only; states are raw strings. Null when neither carried one.
    */
   public Map<String, Object> inspection() {
     return inspection;

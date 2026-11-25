@@ -11,8 +11,8 @@ import java.util.List;
  * optional; the gateway falls back gracefully if any are missing.
  *
  * <p>Set {@link ChatCompletionRequest.Builder#ragContext(RagContext)} to attach. The SDK serialises
- * this under {@code trustgate_metadata.rag_context}; the gateway strips that key before forwarding
- * to the LLM provider, so the upstream model never sees the control-plane metadata.
+ * this under {@code shashu_metadata.rag_context}; the gateway strips that key before forwarding to
+ * the LLM provider, so the upstream model never sees the control-plane metadata.
  *
  * <p>Without RAG context, the gateway scans concatenated retrieved text on the generic {@code
  * ingress-text} surface — substantially less effective at catching indirect prompt injection inside

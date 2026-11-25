@@ -9,23 +9,23 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Builds the {@code x-trustgate-*} + {@code x-trustlog-*} headers that give the gateway Shadow AI
+ * Builds the {@code x-shashu-*} + {@code x-trustlog-*} headers that give the gateway Shadow AI
  * attribution and runtime context for every request. Symmetric with the .NET SDK's {@code
  * WorkflowContext} class and the Python SDK's {@code build_trustgate_headers()}.
  *
  * <p>What gets emitted:
  *
  * <ul>
- *   <li>{@code x-trustgate-source} — one of {@code n8n} / {@code github_actions} / {@code
- *       gitlab_ci} / {@code local_script}.
- *   <li>{@code x-trustgate-trace-id} — workflow trace id from {@code N8N_EXECUTION_ID} / {@code
+ *   <li>{@code x-shashu-source} — one of {@code n8n} / {@code github_actions} / {@code gitlab_ci} /
+ *       {@code local_script}.
+ *   <li>{@code x-shashu-trace-id} — workflow trace id from {@code N8N_EXECUTION_ID} / {@code
  *       GITHUB_RUN_ID} / {@code CI_PIPELINE_ID}, or a fresh UUID per call.
- *   <li>{@code x-trustgate-workflow-name} — when running inside a managed workflow.
- *   <li>{@code x-trustgate-workflow-step} — caller-supplied or auto-detected from {@code
+ *   <li>{@code x-shashu-workflow-name} — when running inside a managed workflow.
+ *   <li>{@code x-shashu-workflow-step} — caller-supplied or auto-detected from {@code
  *       N8N_NODE_NAME} / {@code N8N_NODE_ID}.
  *   <li>{@code x-trustlog-os} / {@code -arch} / {@code -runtime-version} — runtime metadata.
- *   <li>{@code x-trustgate-source-tool} — JSON blob with SDK identification + system info.
- *       Free-form; extends without breaking the contract.
+ *   <li>{@code x-shashu-source-tool} — JSON blob with SDK identification + system info. Free-form;
+ *       extends without breaking the contract.
  * </ul>
  */
 public final class WorkflowContext {
@@ -76,8 +76,7 @@ public final class WorkflowContext {
    *
    * @param workflowStep optional explicit step (e.g. {@code "Data_Extraction"}); wins over
    *     auto-detection.
-   * @param sourceToolOverrides extra fields merged into the {@code x-trustgate-source-tool} JSON
-   *     blob.
+   * @param sourceToolOverrides extra fields merged into the {@code x-shashu-source-tool} JSON blob.
    */
   public static Map<String, String> build(
       String workflowStep, Map<String, Object> sourceToolOverrides) {
@@ -88,8 +87,7 @@ public final class WorkflowContext {
    * Build the per-request header map.
    *
    * @param workflowStep optional explicit step; wins over auto-detection.
-   * @param sourceToolOverrides extra fields merged into the {@code x-trustgate-source-tool} JSON
-   *     blob.
+   * @param sourceToolOverrides extra fields merged into the {@code x-shashu-source-tool} JSON blob.
    * @param sessionId session to stamp. The caller resolved precedence; this method does not mint.
    *     Emitted whenever non-empty, at origin and mid-flow.
    */
@@ -102,18 +100,18 @@ public final class WorkflowContext {
         (workflowStep != null && !workflowStep.isBlank()) ? workflowStep : resolveN8NWorkflowStep();
 
     Map<String, String> headers = new LinkedHashMap<>();
-    headers.put("x-trustgate-source", source);
-    headers.put("x-trustgate-trace-id", traceId);
+    headers.put("x-shashu-source", source);
+    headers.put("x-shashu-trace-id", traceId);
     headers.put("x-trustlog-os", System.getProperty("os.name", "unknown").toLowerCase());
     headers.put("x-trustlog-arch", System.getProperty("os.arch", "unknown").toLowerCase());
     headers.put(
         "x-trustlog-runtime-version", "java-" + System.getProperty("java.version", "unknown"));
 
     if (workflowName != null && !workflowName.isBlank()) {
-      headers.put("x-trustgate-workflow-name", workflowName);
+      headers.put("x-shashu-workflow-name", workflowName);
     }
     if (step != null && !step.isBlank()) {
-      headers.put("x-trustgate-workflow-step", step);
+      headers.put("x-shashu-workflow-step", step);
     }
 
     // Source-tool metadata: SDK identification + system info. Same
@@ -130,7 +128,7 @@ public final class WorkflowContext {
       metadata.putAll(sourceToolOverrides);
     }
     try {
-      headers.put("x-trustgate-source-tool", MAPPER.writeValueAsString(metadata));
+      headers.put("x-shashu-source-tool", MAPPER.writeValueAsString(metadata));
     } catch (Exception e) {
       // Non-fatal: omit source-tool if serialisation fails. The other
       // headers carry enough context for the gateway to attribute traffic.
@@ -144,17 +142,17 @@ public final class WorkflowContext {
     if (Tracer.isActive()) {
       String activeTrace = Tracer.traceId();
       if (activeTrace != null) {
-        headers.put("x-trustgate-trace-id", activeTrace);
+        headers.put("x-shashu-trace-id", activeTrace);
         String span = Tracer.currentSpanId();
         String parent = Tracer.parentSpanId();
-        headers.put("x-trustgate-span-id", span != null ? span : "");
-        headers.put("x-trustgate-parent-id", parent != null ? parent : "");
+        headers.put("x-shashu-span-id", span != null ? span : "");
+        headers.put("x-shashu-parent-id", parent != null ? parent : "");
       }
     } else if (Tracer.isA2aHop()) {
       // Mid-flow without a span: PROPAGATE the captured trace (do NOT mint a new one).
       String flowTrace = Tracer.traceId();
       if (flowTrace != null) {
-        headers.put("x-trustgate-trace-id", flowTrace);
+        headers.put("x-shashu-trace-id", flowTrace);
       }
     }
 
@@ -164,7 +162,7 @@ public final class WorkflowContext {
     // source. A second read here made the A2A-overrides rule unprovable:
     // a mutation that emptied the caller's resolution left the test green.
     if (sessionId != null && !sessionId.isBlank()) {
-      headers.put("x-trustgate-session-id", sessionId);
+      headers.put("x-shashu-session-id", sessionId);
     }
 
     // A2A OUTBOUND PROPAGATION (WP-A2A-4 / ADR-007 §0, §4.1 LOCKED). Only mid-flow
@@ -179,9 +177,9 @@ public final class WorkflowContext {
     if (Tracer.isA2aHop()) {
       String inboundCaller = Tracer.inboundCallerAgentId();
       if (inboundCaller != null) {
-        headers.put("x-trustgate-caller-agent-id", inboundCaller);
+        headers.put("x-shashu-caller-agent-id", inboundCaller);
       }
-      headers.put("x-trustgate-hop-depth", Integer.toString(Tracer.outboundHopDepth()));
+      headers.put("x-shashu-hop-depth", Integer.toString(Tracer.outboundHopDepth()));
     }
 
     return headers;
@@ -231,11 +229,11 @@ public final class WorkflowContext {
     String session = resolveSession(sessionId, null);
 
     Map<String, String> headers = new LinkedHashMap<>();
-    headers.put("x-trustgate-trace-id", trace);
-    headers.put("x-trustgate-caller-agent-id", callerAgentId);
-    headers.put("x-trustgate-hop-depth", Integer.toString(hop));
+    headers.put("x-shashu-trace-id", trace);
+    headers.put("x-shashu-caller-agent-id", callerAgentId);
+    headers.put("x-shashu-hop-depth", Integer.toString(hop));
     if (session != null && !session.isBlank()) {
-      headers.put("x-trustgate-session-id", session);
+      headers.put("x-shashu-session-id", session);
     }
     return headers;
   }

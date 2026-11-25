@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
  *
  * <p>Shashu is self-hosted, so an SDK that guessed a hostname would send a misconfigured process's
  * prompts to a host nobody in that organisation chose. These hold the two properties the contract
- * states for every SDK: the error <b>names {@code TRUSTGATE_BASE_URL}</b>, and it <b>contains no
+ * states for every SDK: the error <b>names {@code SHASHU_BASE_URL}</b>, and it <b>contains no
  * hostname</b>.
  */
 @DisplayName("Case 12: there is no default gateway address")
@@ -39,7 +39,7 @@ class RetrievalConfigTests {
         + argument
         + " to "
         + entryPoint
-        + ", or set the SHASHU_BASE_URL or TRUSTGATE_BASE_URL environment variable. SHASHU is"
+        + ", or set the SHASHU_BASE_URL environment variable. SHASHU is"
         + " self-hosted: the SDK has no default address and will not guess one.";
   }
 
@@ -54,7 +54,7 @@ class RetrievalConfigTests {
   }
 
   @Test
-  @DisplayName("the client throws, naming TRUSTGATE_BASE_URL and no hostname")
+  @DisplayName("the client throws, naming SHASHU_BASE_URL and no hostname")
   void the_client_refuses_to_build_without_an_address() {
     RetrievalTestAccess.setEnv(Map.of());
 
@@ -89,9 +89,9 @@ class RetrievalConfigTests {
   }
 
   @Test
-  @DisplayName("TRUSTGATE_BASE_URL is used when no explicit address is passed")
+  @DisplayName("SHASHU_BASE_URL is used when no explicit address is passed")
   void the_environment_variable_resolves() {
-    RetrievalTestAccess.setEnv(Map.of("TRUSTGATE_BASE_URL", "https://gw.internal.example/"));
+    RetrievalTestAccess.setEnv(Map.of("SHASHU_BASE_URL", "https://gw.internal.example/"));
 
     // Constructing without throwing IS the assertion: the interceptor
     // resolves its address in the constructor.
@@ -106,7 +106,7 @@ class RetrievalConfigTests {
   @Test
   @DisplayName("an explicit address always beats the environment")
   void the_explicit_option_wins() {
-    RetrievalTestAccess.setEnv(Map.of("TRUSTGATE_BASE_URL", "https://from-env.example/"));
+    RetrievalTestAccess.setEnv(Map.of("SHASHU_BASE_URL", "https://from-env.example/"));
     // No throw, and no reliance on the env value: the explicit one is used.
     new ShashuRoutingInterceptor("sk-trustgate-test", "https://explicit.test.invalid/", null);
   }
@@ -135,7 +135,7 @@ class RetrievalConfigTests {
   /** The two properties the contract asserts in every SDK's surface test. */
   private static void assertNamesTheVariableAndNoHost(String message) {
     assertTrue(
-        message.contains("TRUSTGATE_BASE_URL"), "the message must name the variable: " + message);
+        message.contains("SHASHU_BASE_URL"), "the message must name the variable: " + message);
     assertFalse(
         message.contains("trustgateai.io"),
         "there is no address to suggest, so suggesting one is a bug: " + message);

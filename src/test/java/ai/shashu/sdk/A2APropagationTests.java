@@ -46,13 +46,13 @@ class A2APropagationTests {
     try (Tracer.A2aScope s =
         Tracer.incoming(
             h(
-                "x-trustgate-trace-id",
+                "x-shashu-trace-id",
                 "flow-1",
-                "x-trustgate-session-id",
+                "x-shashu-session-id",
                 "sess-1",
-                "x-trustgate-hop-depth",
+                "x-shashu-hop-depth",
                 "2",
-                "x-trustgate-caller-agent-id",
+                "x-shashu-caller-agent-id",
                 "agent-A"))) {
       assertTrue(Tracer.isA2aHop());
       assertEquals("flow-1", Tracer.traceId());
@@ -67,7 +67,7 @@ class A2APropagationTests {
   @Test
   void no_inbound_trace_is_origin_returns_false() {
     try (Tracer.A2aScope s = Tracer.incoming(h())) {
-      assertFalse(Tracer.captureIncoming(h("x-trustgate-session-id", "s")));
+      assertFalse(Tracer.captureIncoming(h("x-shashu-session-id", "s")));
       assertFalse(Tracer.captureIncoming(h()));
       assertFalse(Tracer.isA2aHop());
     }
@@ -78,11 +78,11 @@ class A2APropagationTests {
     try (Tracer.A2aScope s =
         Tracer.incoming(
             h(
-                "X-Trustgate-Trace-Id",
+                "X-Shashu-Trace-Id",
                 "T1",
-                "X-Trustgate-Session-Id",
+                "X-Shashu-Session-Id",
                 "S1",
-                "X-Trustgate-Caller-Agent-Id",
+                "X-Shashu-Caller-Agent-Id",
                 "A1"))) {
       assertEquals("T1", Tracer.traceId());
       assertEquals("S1", Tracer.sessionId());
@@ -94,7 +94,7 @@ class A2APropagationTests {
   void garbage_hop_depth_defaults_to_zero() {
     // Advisory header: non-numeric/negative → inbound 0, outbound 1 (never throws).
     try (Tracer.A2aScope s =
-        Tracer.incoming(h("x-trustgate-trace-id", "T2", "x-trustgate-hop-depth", "not-a-number"))) {
+        Tracer.incoming(h("x-shashu-trace-id", "T2", "x-shashu-hop-depth", "not-a-number"))) {
       assertEquals(0, Tracer.inboundHopDepth());
       assertEquals(1, Tracer.outboundHopDepth());
     }
@@ -102,7 +102,7 @@ class A2APropagationTests {
 
   @Test
   void no_hop_header_defaults_outbound_to_one() {
-    try (Tracer.A2aScope s = Tracer.incoming(h("x-trustgate-trace-id", "f"))) {
+    try (Tracer.A2aScope s = Tracer.incoming(h("x-shashu-trace-id", "f"))) {
       assertEquals(0, Tracer.inboundHopDepth());
       assertEquals(1, Tracer.outboundHopDepth());
     }
@@ -111,7 +111,7 @@ class A2APropagationTests {
   @Test
   void no_caller_leaves_inbound_caller_null() {
     try (Tracer.A2aScope s =
-        Tracer.incoming(h("x-trustgate-trace-id", "f", "x-trustgate-hop-depth", "1"))) {
+        Tracer.incoming(h("x-shashu-trace-id", "f", "x-shashu-hop-depth", "1"))) {
       assertNull(Tracer.inboundCallerAgentId());
     }
   }
@@ -124,18 +124,18 @@ class A2APropagationTests {
     try (Tracer.A2aScope s =
         Tracer.incoming(
             h(
-                "x-trustgate-trace-id",
+                "x-shashu-trace-id",
                 "flow-xyz",
-                "x-trustgate-session-id",
+                "x-shashu-session-id",
                 "sess-1",
-                "x-trustgate-hop-depth",
+                "x-shashu-hop-depth",
                 "2",
-                "x-trustgate-caller-agent-id",
+                "x-shashu-caller-agent-id",
                 "agent-A"))) {
       Map<String, String> hdr = WorkflowContext.build();
-      assertEquals("flow-xyz", hdr.get("x-trustgate-trace-id")); // propagated, not a fresh UUID
-      assertEquals("sess-1", hdr.get("x-trustgate-session-id"));
-      assertEquals("3", hdr.get("x-trustgate-hop-depth")); // inbound 2 + 1
+      assertEquals("flow-xyz", hdr.get("x-shashu-trace-id")); // propagated, not a fresh UUID
+      assertEquals("sess-1", hdr.get("x-shashu-session-id"));
+      assertEquals("3", hdr.get("x-shashu-hop-depth")); // inbound 2 + 1
     }
   }
 
@@ -144,13 +144,13 @@ class A2APropagationTests {
     try (Tracer.A2aScope s =
         Tracer.incoming(
             h(
-                "x-trustgate-trace-id",
+                "x-shashu-trace-id",
                 "F",
-                "x-trustgate-caller-agent-id",
+                "x-shashu-caller-agent-id",
                 "agent-A",
-                "x-trustgate-hop-depth",
+                "x-shashu-hop-depth",
                 "1"))) {
-      assertEquals("agent-A", WorkflowContext.build().get("x-trustgate-caller-agent-id"));
+      assertEquals("agent-A", WorkflowContext.build().get("x-shashu-caller-agent-id"));
     }
   }
 
@@ -158,31 +158,31 @@ class A2APropagationTests {
   void origin_emits_no_lineage_headers() {
     try (Tracer.A2aScope s = Tracer.incoming(h())) { // explicit origin scope
       Map<String, String> hdr = WorkflowContext.build();
-      assertFalse(hdr.containsKey("x-trustgate-session-id"));
-      assertFalse(hdr.containsKey("x-trustgate-caller-agent-id"));
-      assertFalse(hdr.containsKey("x-trustgate-hop-depth"));
+      assertFalse(hdr.containsKey("x-shashu-session-id"));
+      assertFalse(hdr.containsKey("x-shashu-caller-agent-id"));
+      assertFalse(hdr.containsKey("x-shashu-hop-depth"));
     }
   }
 
   @Test
   void caller_omitted_when_no_inbound_caller() {
     try (Tracer.A2aScope s =
-        Tracer.incoming(h("x-trustgate-trace-id", "f", "x-trustgate-hop-depth", "1"))) {
+        Tracer.incoming(h("x-shashu-trace-id", "f", "x-shashu-hop-depth", "1"))) {
       Map<String, String> hdr = WorkflowContext.build();
-      assertEquals("f", hdr.get("x-trustgate-trace-id"));
-      assertEquals("2", hdr.get("x-trustgate-hop-depth"));
-      assertFalse(hdr.containsKey("x-trustgate-caller-agent-id"));
+      assertEquals("f", hdr.get("x-shashu-trace-id"));
+      assertEquals("2", hdr.get("x-shashu-hop-depth"));
+      assertFalse(hdr.containsKey("x-shashu-caller-agent-id"));
     }
   }
 
   @Test
   void session_omitted_when_not_propagated() {
     try (Tracer.A2aScope s =
-        Tracer.incoming(h("x-trustgate-trace-id", "f", "x-trustgate-caller-agent-id", "A"))) {
+        Tracer.incoming(h("x-shashu-trace-id", "f", "x-shashu-caller-agent-id", "A"))) {
       Map<String, String> hdr = WorkflowContext.build();
-      assertFalse(hdr.containsKey("x-trustgate-session-id"));
-      assertEquals("A", hdr.get("x-trustgate-caller-agent-id")); // forwarded invoker
-      assertEquals("1", hdr.get("x-trustgate-hop-depth"));
+      assertFalse(hdr.containsKey("x-shashu-session-id"));
+      assertEquals("A", hdr.get("x-shashu-caller-agent-id")); // forwarded invoker
+      assertEquals("1", hdr.get("x-shashu-hop-depth"));
     }
   }
 
@@ -191,21 +191,21 @@ class A2APropagationTests {
     try (Tracer.A2aScope s =
             Tracer.incoming(
                 h(
-                    "x-trustgate-trace-id",
+                    "x-shashu-trace-id",
                     "FLOW",
-                    "x-trustgate-session-id",
+                    "x-shashu-session-id",
                     "S",
-                    "x-trustgate-hop-depth",
+                    "x-shashu-hop-depth",
                     "1",
-                    "x-trustgate-caller-agent-id",
+                    "x-shashu-caller-agent-id",
                     "A"));
         Tracer.SpanHandle span = Tracer.span("work")) {
       Map<String, String> hdr = WorkflowContext.build();
-      assertEquals("FLOW", hdr.get("x-trustgate-trace-id")); // span inherits captured trace
-      assertTrue(hdr.containsKey("x-trustgate-span-id"));
-      assertEquals("S", hdr.get("x-trustgate-session-id"));
-      assertEquals("A", hdr.get("x-trustgate-caller-agent-id")); // forwarded invoker, not self
-      assertEquals("2", hdr.get("x-trustgate-hop-depth"));
+      assertEquals("FLOW", hdr.get("x-shashu-trace-id")); // span inherits captured trace
+      assertTrue(hdr.containsKey("x-shashu-span-id"));
+      assertEquals("S", hdr.get("x-shashu-session-id"));
+      assertEquals("A", hdr.get("x-shashu-caller-agent-id")); // forwarded invoker, not self
+      assertEquals("2", hdr.get("x-shashu-hop-depth"));
     }
   }
 
@@ -216,10 +216,10 @@ class A2APropagationTests {
   void invocation_at_origin_stamps_caller_self() {
     try (Tracer.A2aScope s = Tracer.incoming(h())) { // clean origin: outbound hop = 1, no session
       Map<String, String> hdr = WorkflowContext.buildInvocationHeaders("agent-A");
-      assertEquals("agent-A", hdr.get("x-trustgate-caller-agent-id"));
-      assertTrue(hdr.containsKey("x-trustgate-trace-id"));
-      assertEquals("1", hdr.get("x-trustgate-hop-depth"));
-      assertFalse(hdr.containsKey("x-trustgate-session-id"));
+      assertEquals("agent-A", hdr.get("x-shashu-caller-agent-id"));
+      assertTrue(hdr.containsKey("x-shashu-trace-id"));
+      assertEquals("1", hdr.get("x-shashu-hop-depth"));
+      assertFalse(hdr.containsKey("x-shashu-session-id"));
     }
   }
 
@@ -228,30 +228,30 @@ class A2APropagationTests {
     try (Tracer.A2aScope s =
         Tracer.incoming(
             h(
-                "x-trustgate-trace-id",
+                "x-shashu-trace-id",
                 "F",
-                "x-trustgate-session-id",
+                "x-shashu-session-id",
                 "S",
-                "x-trustgate-hop-depth",
+                "x-shashu-hop-depth",
                 "1",
-                "x-trustgate-caller-agent-id",
+                "x-shashu-caller-agent-id",
                 "agent-A"))) {
       Map<String, String> hdr = WorkflowContext.buildInvocationHeaders("agent-B");
-      assertEquals("F", hdr.get("x-trustgate-trace-id")); // served flow propagated
+      assertEquals("F", hdr.get("x-shashu-trace-id")); // served flow propagated
       assertEquals(
-          "agent-B", hdr.get("x-trustgate-caller-agent-id")); // B stamps ITSELF as invoker of C
-      assertEquals("S", hdr.get("x-trustgate-session-id"));
-      assertEquals("2", hdr.get("x-trustgate-hop-depth"));
+          "agent-B", hdr.get("x-shashu-caller-agent-id")); // B stamps ITSELF as invoker of C
+      assertEquals("S", hdr.get("x-shashu-session-id"));
+      assertEquals("2", hdr.get("x-shashu-hop-depth"));
     }
   }
 
   @Test
   void invocation_honors_explicit_overrides() {
     Map<String, String> hdr = WorkflowContext.buildInvocationHeaders("me", "T", "S", 5);
-    assertEquals("T", hdr.get("x-trustgate-trace-id"));
-    assertEquals("me", hdr.get("x-trustgate-caller-agent-id"));
-    assertEquals("5", hdr.get("x-trustgate-hop-depth"));
-    assertEquals("S", hdr.get("x-trustgate-session-id"));
+    assertEquals("T", hdr.get("x-shashu-trace-id"));
+    assertEquals("me", hdr.get("x-shashu-caller-agent-id"));
+    assertEquals("5", hdr.get("x-shashu-hop-depth"));
+    assertEquals("S", hdr.get("x-shashu-session-id"));
   }
 
   @Test
@@ -267,24 +267,24 @@ class A2APropagationTests {
       // A (origin) invokes B: A stamps caller = A.
       Map<String, String> aToB =
           WorkflowContext.buildInvocationHeaders("agent-A", "FLOW", null, null);
-      assertEquals("agent-A", aToB.get("x-trustgate-caller-agent-id"));
+      assertEquals("agent-A", aToB.get("x-shashu-caller-agent-id"));
 
       // B serves A's call: B's gateway call FORWARDS caller = A (the A→B edge).
       try (Tracer.A2aScope bServes = Tracer.incoming(aToB)) {
         Map<String, String> bGw = WorkflowContext.build();
-        assertEquals("FLOW", bGw.get("x-trustgate-trace-id"));
-        assertEquals("agent-A", bGw.get("x-trustgate-caller-agent-id"));
-        assertEquals("2", bGw.get("x-trustgate-hop-depth")); // inbound 1 + 1
+        assertEquals("FLOW", bGw.get("x-shashu-trace-id"));
+        assertEquals("agent-A", bGw.get("x-shashu-caller-agent-id"));
+        assertEquals("2", bGw.get("x-shashu-hop-depth")); // inbound 1 + 1
 
         // B invokes C: B stamps ITSELF; C will then forward B (the B→C edge).
         Map<String, String> bToC = WorkflowContext.buildInvocationHeaders("agent-B");
-        assertEquals("agent-B", bToC.get("x-trustgate-caller-agent-id"));
-        assertEquals("FLOW", bToC.get("x-trustgate-trace-id")); // same flow
+        assertEquals("agent-B", bToC.get("x-shashu-caller-agent-id"));
+        assertEquals("FLOW", bToC.get("x-shashu-trace-id")); // same flow
 
         try (Tracer.A2aScope cServes = Tracer.incoming(bToC)) {
           Map<String, String> cGw = WorkflowContext.build();
-          assertEquals("agent-B", cGw.get("x-trustgate-caller-agent-id")); // C forwards B
-          assertEquals("3", cGw.get("x-trustgate-hop-depth"));
+          assertEquals("agent-B", cGw.get("x-shashu-caller-agent-id")); // C forwards B
+          assertEquals("3", cGw.get("x-shashu-hop-depth"));
         }
       }
     }
@@ -298,14 +298,14 @@ class A2APropagationTests {
     try (Tracer.A2aScope s =
         Tracer.incoming(
             h(
-                "x-trustgate-trace-id",
+                "x-shashu-trace-id",
                 "T",
-                "x-trustgate-session-id",
+                "x-shashu-session-id",
                 "S",
-                "x-trustgate-caller-agent-id",
+                "x-shashu-caller-agent-id",
                 "A"))) {
       assertTrue(Tracer.isA2aHop());
-      assertEquals("T", WorkflowContext.build().get("x-trustgate-trace-id"));
+      assertEquals("T", WorkflowContext.build().get("x-shashu-trace-id"));
     }
     assertFalse(Tracer.isA2aHop()); // restored → origin, no lineage leakage
   }
@@ -313,10 +313,10 @@ class A2APropagationTests {
   @Test
   void nested_incoming_scopes_restore_outer_flow() {
     try (Tracer.A2aScope outer =
-        Tracer.incoming(h("x-trustgate-trace-id", "OUTER", "x-trustgate-hop-depth", "1"))) {
+        Tracer.incoming(h("x-shashu-trace-id", "OUTER", "x-shashu-hop-depth", "1"))) {
       assertEquals("OUTER", Tracer.traceId());
       try (Tracer.A2aScope inner =
-          Tracer.incoming(h("x-trustgate-trace-id", "INNER", "x-trustgate-hop-depth", "5"))) {
+          Tracer.incoming(h("x-shashu-trace-id", "INNER", "x-shashu-hop-depth", "5"))) {
         assertEquals("INNER", Tracer.traceId());
         assertEquals(6, Tracer.outboundHopDepth());
       }
@@ -340,12 +340,12 @@ class A2APropagationTests {
             .build()) {
       assertEquals("seed-self", client.agentId());
       try (Tracer.A2aScope s =
-          Tracer.incoming(h("x-trustgate-trace-id", "F", "x-trustgate-hop-depth", "1"))) {
+          Tracer.incoming(h("x-shashu-trace-id", "F", "x-shashu-hop-depth", "1"))) {
         Map<String, String> hdr = client.buildInvocationHeaders();
         assertEquals(
-            "seed-self", hdr.get("x-trustgate-caller-agent-id")); // caller = self (invoking side)
-        assertEquals("F", hdr.get("x-trustgate-trace-id"));
-        assertEquals("2", hdr.get("x-trustgate-hop-depth"));
+            "seed-self", hdr.get("x-shashu-caller-agent-id")); // caller = self (invoking side)
+        assertEquals("F", hdr.get("x-shashu-trace-id"));
+        assertEquals("2", hdr.get("x-shashu-hop-depth"));
       }
     }
   }
@@ -374,7 +374,7 @@ class A2APropagationTests {
           new MockResponse()
               .setResponseCode(200)
               .setHeader("Content-Type", "application/json")
-              .setHeader("x-trustgate-agent-id", "gw-reported")
+              .setHeader("x-shashu-agent-id", "gw-reported")
               .setBody(okBody()));
 
       try (ShashuClient client =
@@ -387,11 +387,11 @@ class A2APropagationTests {
         try (Tracer.A2aScope s =
             Tracer.incoming(
                 h(
-                    "x-trustgate-trace-id",
+                    "x-shashu-trace-id",
                     "flow-A",
-                    "x-trustgate-hop-depth",
+                    "x-shashu-hop-depth",
                     "1",
-                    "x-trustgate-caller-agent-id",
+                    "x-shashu-caller-agent-id",
                     "upstream-A"))) {
           client
               .chat()
@@ -407,10 +407,9 @@ class A2APropagationTests {
       }
 
       RecordedRequest req = server.takeRequest();
-      assertEquals("flow-A", req.getHeader("x-trustgate-trace-id")); // propagated
-      assertEquals(
-          "upstream-A", req.getHeader("x-trustgate-caller-agent-id")); // FORWARDED, not self
-      assertEquals("2", req.getHeader("x-trustgate-hop-depth")); // inbound 1 + 1
+      assertEquals("flow-A", req.getHeader("x-shashu-trace-id")); // propagated
+      assertEquals("upstream-A", req.getHeader("x-shashu-caller-agent-id")); // FORWARDED, not self
+      assertEquals("2", req.getHeader("x-shashu-hop-depth")); // inbound 1 + 1
     } finally {
       server.shutdown();
     }
@@ -424,7 +423,7 @@ class A2APropagationTests {
       server.enqueue(
           new MockResponse()
               .setResponseCode(403)
-              .setHeader("x-trustgate-agent-id", "gw-reported")
+              .setHeader("x-shashu-agent-id", "gw-reported")
               .setBody("{\"error\":{\"message\":\"blocked\",\"type\":\"invalid_request_error\"}}"));
 
       try (ShashuClient client =
@@ -485,11 +484,11 @@ class A2APropagationTests {
       RecordedRequest req = server.takeRequest();
       // Origin: no caller even when self is seeded; no hop either.
       // Session IS sent — one client is one session (Job 2). The previous
-      // assertion `assertNull(x-trustgate-session-id)` pinned the defect
+      // assertion `assertNull(x-shashu-session-id)` pinned the defect
       // (same template as Node a2a.test.ts:335 and .NET A2APropagationTests L382).
-      assertNull(req.getHeader("x-trustgate-caller-agent-id"));
-      assertNotNull(req.getHeader("x-trustgate-session-id"));
-      assertNull(req.getHeader("x-trustgate-hop-depth"));
+      assertNull(req.getHeader("x-shashu-caller-agent-id"));
+      assertNotNull(req.getHeader("x-shashu-session-id"));
+      assertNull(req.getHeader("x-shashu-hop-depth"));
     } finally {
       server.shutdown();
     }

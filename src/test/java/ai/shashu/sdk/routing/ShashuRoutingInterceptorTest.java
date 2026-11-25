@@ -203,7 +203,7 @@ class ShashuRoutingInterceptorTest {
             .post(
                 RequestBody.create("{\"model\":\"gpt-4o\"}", MediaType.parse("application/json")));
     if (presetVersion != null) {
-      req.header("trustgate-version", presetVersion);
+      req.header("shashu-version", presetVersion);
     }
     http.newCall(req.build()).execute().close();
     return gateway.takeRequest();
@@ -212,14 +212,13 @@ class ShashuRoutingInterceptorTest {
   @Test
   void routed_request_carries_the_default_contract_version() throws Exception {
     RecordedRequest seen = routeOne(buildClient(), null);
-    assertEquals("2026-09-01", seen.getHeader("trustgate-version"));
-    assertNull(seen.getHeader("trustgate-block-encoding"));
+    assertEquals("2026-09-01", seen.getHeader("shashu-version"));
+    assertNull(seen.getHeader("shashu-block-encoding"));
   }
 
   @Test
   void routed_request_keeps_a_version_the_caller_already_set() throws Exception {
-    assertEquals(
-        "2026-10-01", routeOne(buildClient(), "2026-10-01").getHeader("trustgate-version"));
+    assertEquals("2026-10-01", routeOne(buildClient(), "2026-10-01").getHeader("shashu-version"));
   }
 
   @Test
@@ -230,7 +229,7 @@ class ShashuRoutingInterceptorTest {
                 GatewayRouting.asInterceptor(
                     "sk-trustgate-fake", gateway.url("/").toString(), null, null))
             .build();
-    assertNull(routeOne(http, null).getHeader("trustgate-version"));
+    assertNull(routeOne(http, null).getHeader("shashu-version"));
   }
 
   @Test
@@ -238,7 +237,7 @@ class ShashuRoutingInterceptorTest {
     OkHttpClient http =
         GatewayRouting.newOkHttpClient(
             "sk-trustgate-fake", gateway.url("/").toString(), null, "2026-10-01");
-    assertEquals("2026-10-01", routeOne(http, null).getHeader("trustgate-version"));
+    assertEquals("2026-10-01", routeOne(http, null).getHeader("shashu-version"));
   }
 
   @Test
@@ -254,9 +253,9 @@ class ShashuRoutingInterceptorTest {
 
   @Test
   void facade_throws_when_api_key_missing() {
-    // Skip if TRUSTGATE_API_KEY env happens to be set — see the
+    // Skip if SHASHU_API_KEY env happens to be set — see the
     // Java SDK builder test for the same pattern.
-    String envKey = System.getenv("TRUSTGATE_API_KEY");
+    String envKey = System.getenv("SHASHU_API_KEY");
     String shashuKey = System.getenv("SHASHU_API_KEY");
     if ((envKey != null && !envKey.isBlank()) || (shashuKey != null && !shashuKey.isBlank())) {
       return;

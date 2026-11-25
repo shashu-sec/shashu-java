@@ -69,7 +69,7 @@ class IdentityI4CredentialTest {
                     .build());
     assertEquals(CredentialResolver.BOTH_OR_NEITHER, both.getMessage());
 
-    if (System.getenv("SHASHU_API_KEY") == null && System.getenv("TRUSTGATE_API_KEY") == null) {
+    if (System.getenv("SHASHU_API_KEY") == null && System.getenv("SHASHU_API_KEY") == null) {
       ShashuConfigException neither =
           assertThrows(
               ShashuConfigException.class,

@@ -41,7 +41,7 @@ class ShashuContentFilterExceptionTest {
   private static final String BLOCK_400_JAILBREAK =
       "{\"error\":{\"message\":\"I cannot fulfill this request because it violates the "
           + "organization's security policy.\",\"type\":\"content_filter\",\"param\":null,"
-          + "\"code\":\"jailbreak\",\"trustgate\":{\"decision\":\"block\",\"retryable\":false,"
+          + "\"code\":\"jailbreak\",\"shashu\":{\"decision\":\"block\",\"retryable\":false,"
           + "\"id\":\"9f4c1c2e-6b3d-4a51-9c0e-2a7f8b1d4e30\",\"code\":\"jailbreak\"}},"
           + "\"choices\":[]}";
 
@@ -49,7 +49,7 @@ class ShashuContentFilterExceptionTest {
   private static final String BLOCK_400_DLP =
       "{\"error\":{\"message\":\"I cannot fulfill this request because it violates the "
           + "organization's security policy.\",\"type\":\"content_filter\",\"param\":null,"
-          + "\"code\":\"dlp\",\"trustgate\":{\"decision\":\"block\",\"retryable\":false,"
+          + "\"code\":\"dlp\",\"shashu\":{\"decision\":\"block\",\"retryable\":false,"
           + "\"id\":\"9f4c1c2e-6b3d-4a51-9c0e-2a7f8b1d4e30\",\"code\":\"dlp\"}},\"choices\":[]}";
 
   /**

@@ -41,8 +41,7 @@ class ShashuClientTest {
     // (We can't unset env vars from inside the JVM, but a non-empty
     // value would still be a valid key from the SDK's POV; the test
     // is only meaningful when the env is empty.)
-    if ((System.getenv("TRUSTGATE_API_KEY") != null
-            && !System.getenv("TRUSTGATE_API_KEY").isBlank())
+    if ((System.getenv("SHASHU_API_KEY") != null && !System.getenv("SHASHU_API_KEY").isBlank())
         || (System.getenv("SHASHU_API_KEY") != null
             && !System.getenv("SHASHU_API_KEY").isBlank())) {
       return; // skip in environments where the env is set

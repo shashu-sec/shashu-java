@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  * The contract version this SDK declares on every request, and what a caller sees because of it.
  * Parity with the Python SDK's {@code DEFAULT_CONTRACT_VERSION} ({@code trustgate/context.py}).
  *
- * <p>The gateway resolves an ABSENT {@code trustgate-version} header to its legacy contract ({@code
+ * <p>The gateway resolves an ABSENT {@code shashu-version} header to its legacy contract ({@code
  * core/app/contract/version.py}), which flattens every refusal into a 200 and withholds the body
  * envelope. Declaring {@code 2026-09-01} is what puts the memory and inspection blocks in the body
  * and turns a refusal into an error status.
@@ -59,8 +59,8 @@ class ContractVersionHeaderTest {
       client.chat().completions().create(req());
     }
     RecordedRequest seen = server.takeRequest();
-    assertEquals("2026-09-01", seen.getHeader("trustgate-version"));
-    assertNull(seen.getHeader("trustgate-block-encoding"));
+    assertEquals("2026-09-01", seen.getHeader("shashu-version"));
+    assertNull(seen.getHeader("shashu-block-encoding"));
   }
 
   @Test
@@ -76,7 +76,7 @@ class ContractVersionHeaderTest {
         /* drain */
       }
     }
-    assertEquals("2026-09-01", server.takeRequest().getHeader("trustgate-version"));
+    assertEquals("2026-09-01", server.takeRequest().getHeader("shashu-version"));
   }
 
   @Test
@@ -85,7 +85,7 @@ class ContractVersionHeaderTest {
     try (ShashuClient client = builder().contractVersion("2026-10-01").build()) {
       client.chat().completions().create(req());
     }
-    assertEquals("2026-10-01", server.takeRequest().getHeader("trustgate-version"));
+    assertEquals("2026-10-01", server.takeRequest().getHeader("shashu-version"));
   }
 
   // (b) ------------------------------------------------------------------
@@ -100,7 +100,7 @@ class ContractVersionHeaderTest {
     enqueue(
         200,
         FileMemoryRouteTest.ok("allow", null, "\"memory\":" + memory),
-        "x-trustgate-memory",
+        "x-shashu-memory",
         "writes=1;blocked=0;recalls=0;flagged=0");
     try (ShashuClient client = client()) {
       ChatCompletionResponse resp = client.chat().completions().create(req());
@@ -128,7 +128,7 @@ class ContractVersionHeaderTest {
     enqueue(
         200,
         FileMemoryRouteTest.ok("allow", null, "\"memory\":" + FileMemoryRouteTest.MEMORY_BLOCKED),
-        "x-trustgate-memory",
+        "x-shashu-memory",
         "writes=1;blocked=1;recalls=0;flagged=0");
     try (ShashuClient client = client()) {
       ChatCompletionResponse resp = client.chat().completions().create(req());
@@ -191,7 +191,7 @@ class ContractVersionHeaderTest {
         "{\"error\":{\"message\":\""
             + sentence
             + "\",\"type\":\"api_error\",\"param\":null,"
-            + "\"code\":\"inspector_timeout\",\"trustgate\":{\"decision\":\"fail\",\"retryable\":false,"
+            + "\"code\":\"inspector_timeout\",\"shashu\":{\"decision\":\"fail\",\"retryable\":false,"
             + "\"id\":\"b510c203\",\"inspection\":{\"input\":\"incomplete\",\"output\":\"skipped\"},"
             + "\"versions\":{\"contract\":\"2026-09-01\"},\"message\":\""
             + sentence
@@ -247,8 +247,8 @@ class ContractVersionHeaderTest {
       assertEquals("content_filter", ex.errorType());
     }
     RecordedRequest seen = server.takeRequest();
-    assertNull(seen.getHeader("trustgate-version"));
-    assertNull(seen.getHeader("trustgate-block-encoding"));
+    assertNull(seen.getHeader("shashu-version"));
+    assertNull(seen.getHeader("shashu-block-encoding"));
   }
 
   @Test
@@ -257,7 +257,7 @@ class ContractVersionHeaderTest {
     try (ShashuClient client = builder().contractVersion("  ").build()) {
       client.chat().completions().create(req());
     }
-    assertNull(server.takeRequest().getHeader("trustgate-version"));
+    assertNull(server.takeRequest().getHeader("shashu-version"));
   }
 
   @Test
@@ -274,7 +274,7 @@ class ContractVersionHeaderTest {
     return "{\"error\":{\"message\":\""
         + SENTENCE
         + "\",\"type\":\"content_filter\",\"param\":null,"
-        + "\"code\":\"jailbreak\",\"trustgate\":{\"decision\":\"block\",\"retryable\":false,"
+        + "\"code\":\"jailbreak\",\"shashu\":{\"decision\":\"block\",\"retryable\":false,"
         + "\"id\":\"b510c203\",\"inspection\":{\"input\":\"checked\",\"output\":\"skipped\"},"
         + "\"versions\":{\"contract\":\"2026-09-01\"},\"message\":\""
         + SENTENCE

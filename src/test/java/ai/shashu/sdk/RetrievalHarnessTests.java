@@ -72,7 +72,7 @@ class RetrievalHarnessTests {
   // ------------------------------------------------------------------ 1
 
   @Test
-  @DisplayName("1 NEGATIVE: no declaration -> no trustgate_metadata at all")
+  @DisplayName("1 NEGATIVE: no declaration -> no shashu_metadata at all")
   void case01_no_declaration_means_no_metadata() throws Exception {
     callModel(client(), "what is the leave policy?");
 
@@ -145,7 +145,7 @@ class RetrievalHarnessTests {
             .build();
 
     Map<String, Object> body = chatBody("hello");
-    body.put("trustgate_metadata", Map.of("rag_context", MAPPER.convertValue(explicit, Map.class)));
+    body.put("shashu_metadata", Map.of("rag_context", MAPPER.convertValue(explicit, Map.class)));
     post(client(), body);
 
     JsonNode context = gateway.single().ragContext();
@@ -587,10 +587,10 @@ class RetrievalHarnessTests {
   // ----------------------------------------------------------------- 11
 
   @Test
-  @DisplayName("11 TRUSTGATE_DISABLE=1 makes the declaration, the bus and the joiner inert")
+  @DisplayName("11 SHASHU_DISABLE=1 makes the declaration, the bus and the joiner inert")
   void case11_the_kill_switch_makes_everything_a_noop() throws Exception {
     String nonce = nonce();
-    RetrievalTestAccess.setEnv(Map.of("TRUSTGATE_DISABLE", "1"));
+    RetrievalTestAccess.setEnv(Map.of("SHASHU_DISABLE", "1"));
 
     Retrieval.declareRetrieval(List.of("suppressed " + nonce), "disabled_corpus");
     try (var scope = Retrieval.retrievalScope(List.of("also suppressed " + nonce), "c")) {
@@ -610,7 +610,7 @@ class RetrievalHarnessTests {
     String nonce = nonce();
     Retrieval.declareRetrieval(List.of("declared before the flip " + nonce), "corpus_x");
 
-    RetrievalTestAccess.setEnv(Map.of("TRUSTGATE_DISABLE", "1"));
+    RetrievalTestAccess.setEnv(Map.of("SHASHU_DISABLE", "1"));
     callModel(client(), "hello");
     assertEquals("not_declared", gateway.single().declaration());
 

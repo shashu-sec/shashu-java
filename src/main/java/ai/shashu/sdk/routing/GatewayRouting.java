@@ -37,8 +37,8 @@ import okhttp3.OkHttpClient;
  *     .build();
  * }</pre>
  *
- * <p>API keys can be passed explicitly or read from the {@code TRUSTGATE_API_KEY} environment
- * variable as a fallback (matches the rest of the SDK).
+ * <p>API keys can be passed explicitly or read from the {@code SHASHU_API_KEY} environment variable
+ * as a fallback (matches the rest of the SDK).
  *
  * <p>Class name kept symmetric with the .NET SDK's {@code Shashu.Routing.GatewayRouting}.
  *
@@ -54,7 +54,7 @@ public final class GatewayRouting {
    * OkHttpClient.Builder.
    *
    * @param apiKey Shashu API key. If {@code null} or blank, falls back to the {@code
-   *     TRUSTGATE_API_KEY} environment variable.
+   *     SHASHU_API_KEY} environment variable.
    * @return an interceptor to add to an {@code OkHttpClient.Builder}
    */
   public static Interceptor asInterceptor(String apiKey) {
@@ -65,9 +65,8 @@ public final class GatewayRouting {
    * Build an interceptor with an explicit gateway URL + optional {@code X-Org-Id} header for
    * admin-tier callers.
    *
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
-   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
+   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping, or {@code null}
    * @return an interceptor to add to an {@code OkHttpClient.Builder}
    */
@@ -80,11 +79,10 @@ public final class GatewayRouting {
   /**
    * Build an interceptor that declares a chosen contract version.
    *
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
-   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
+   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping, or {@code null}
-   * @param contractVersion the {@code trustgate-version} header; default {@link
+   * @param contractVersion the {@code shashu-version} header; default {@link
    *     ShashuClient#DEFAULT_CONTRACT_VERSION}, {@code null} to send none
    * @return an interceptor to add to an {@code OkHttpClient.Builder}
    */
@@ -114,7 +112,7 @@ public final class GatewayRouting {
    * Build an OkHttpClient pre-wired with the routing interceptor. Convenient one-liner for vendor
    * SDKs that accept a pre-built client.
    *
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
    * @return an {@code OkHttpClient} whose provider traffic goes to the gateway
    */
   public static OkHttpClient newOkHttpClient(String apiKey) {
@@ -124,9 +122,8 @@ public final class GatewayRouting {
   /**
    * Build an OkHttpClient with explicit gateway URL + org-id override.
    *
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
-   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
+   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping, or {@code null}
    * @return an {@code OkHttpClient} whose provider traffic goes to the gateway
    */
@@ -140,11 +137,10 @@ public final class GatewayRouting {
    * Build an OkHttpClient that declares a chosen contract version; see {@link
    * #asInterceptor(String, String, String, String)}.
    *
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
-   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
+   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping, or {@code null}
-   * @param contractVersion the {@code trustgate-version} header, or {@code null} to send none
+   * @param contractVersion the {@code shashu-version} header, or {@code null} to send none
    * @return an {@code OkHttpClient} whose provider traffic goes to the gateway
    */
   public static OkHttpClient newOkHttpClient(

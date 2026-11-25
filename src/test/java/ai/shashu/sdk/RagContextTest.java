@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Verifies the typed {@link RagContext} setter + free-form {@code trustGateMetadata} extras
- * serialise correctly under {@code trustgate_metadata.rag_context} in the request body.
+ * serialise correctly under {@code shashu_metadata.rag_context} in the request body.
  */
 class RagContextTest {
 
@@ -57,7 +57,7 @@ class RagContextTest {
   }
 
   @Test
-  void rag_context_serialises_under_trustgate_metadata_rag_context() throws Exception {
+  void rag_context_serialises_under_shashu_metadata_rag_context() throws Exception {
     enqueueOk();
     try (ShashuClient client = newClient()) {
       client
@@ -79,7 +79,7 @@ class RagContextTest {
 
     RecordedRequest req = server.takeRequest();
     JsonNode body = mapper.readTree(req.getBody().readUtf8());
-    JsonNode rag = body.path("trustgate_metadata").path("rag_context");
+    JsonNode rag = body.path("shashu_metadata").path("rag_context");
     assertEquals("policy_docs_v2", rag.path("corpus").asText());
     assertEquals("refinance", rag.path("query").asText());
     assertEquals(2, rag.path("docs").size());
@@ -106,7 +106,7 @@ class RagContextTest {
     }
 
     RecordedRequest req = server.takeRequest();
-    JsonNode meta = mapper.readTree(req.getBody().readUtf8()).path("trustgate_metadata");
+    JsonNode meta = mapper.readTree(req.getBody().readUtf8()).path("shashu_metadata");
     assertEquals("Final_Summary", meta.path("workflow_step").asText());
     assertEquals("value", meta.path("custom_field").asText());
     assertEquals("c", meta.path("rag_context").path("corpus").asText());
@@ -129,11 +129,11 @@ class RagContextTest {
     RecordedRequest req = server.takeRequest();
     JsonNode body = mapper.readTree(req.getBody().readUtf8());
     // Critical: when nothing is set, the field is omitted entirely
-    // (not emitted as `"trustgate_metadata": null`). Otherwise the
+    // (not emitted as `"shashu_metadata": null`). Otherwise the
     // gateway would treat it as an explicit empty metadata block.
     assertTrue(
-        body.path("trustgate_metadata").isMissingNode(),
-        "trustgate_metadata field should be absent when neither RagContext nor extras set");
+        body.path("shashu_metadata").isMissingNode(),
+        "shashu_metadata field should be absent when neither RagContext nor extras set");
   }
 
   @Test
@@ -160,7 +160,7 @@ class RagContextTest {
 
     RecordedRequest req = server.takeRequest();
     JsonNode rag =
-        mapper.readTree(req.getBody().readUtf8()).path("trustgate_metadata").path("rag_context");
+        mapper.readTree(req.getBody().readUtf8()).path("shashu_metadata").path("rag_context");
     assertEquals("from-caller-explicit", rag.path("corpus").asText());
   }
 
@@ -194,6 +194,6 @@ class RagContextTest {
     assertTrue(body.path("stream").asBoolean(), "stream forced to true");
     assertEquals(
         "streamed-corpus",
-        body.path("trustgate_metadata").path("rag_context").path("corpus").asText());
+        body.path("shashu_metadata").path("rag_context").path("corpus").asText());
   }
 }

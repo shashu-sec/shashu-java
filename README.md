@@ -4,7 +4,7 @@ Java client for **SHASHU by Trustgate AI**, a self-hosted AI security gateway.
 Point it at your own gateway. There is no default hostname: construction
 raises a configuration error rather than guessing.
 
-Wire names (`x-trustgate-*`, `trustgate_metadata`, `trustgate-version`,
+Wire names (`x-shashu-*`, `shashu_metadata`, `shashu-version`,
 `tg_sk_`) are protocol names on the SHASHU wire and are unchanged.
 
 After this first mention, this document says **SHASHU**.
@@ -55,8 +55,8 @@ try (ShashuClient client = ShashuClient.builder()
 ```
 
 Give either a key or a token provider, not both. Environment fallbacks:
-`SHASHU_API_KEY` / `SHASHU_BASE_URL`, then `TRUSTGATE_API_KEY` /
-`TRUSTGATE_BASE_URL`.
+`SHASHU_API_KEY` / `SHASHU_BASE_URL`, then `SHASHU_API_KEY` /
+`SHASHU_BASE_URL`.
 
 ## Pass refusals
 

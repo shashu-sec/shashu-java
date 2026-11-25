@@ -75,11 +75,11 @@ class FileMemoryRouteTest {
   static Map<String, String> headers(String decision, String code, String... extra) {
     Map<String, String> h = new LinkedHashMap<>();
     h.put("x-request-id", "b510c203");
-    h.put("x-trustgate-decision", decision);
-    h.put("x-trustgate-inspection", "input=checked;output=checked");
+    h.put("x-shashu-decision", decision);
+    h.put("x-shashu-inspection", "input=checked;output=checked");
     h.put("x-should-retry", "false");
     if (code != null) {
-      h.put("x-trustgate-code", code);
+      h.put("x-shashu-code", code);
     }
     for (int i = 0; i < extra.length; i += 2) {
       h.put(extra[i], extra[i + 1]);
@@ -88,7 +88,7 @@ class FileMemoryRouteTest {
   }
 
   static String ok(String decision, String code, String blocks) {
-    return "{" + CHAT_200 + ",\"trustgate\":" + envelope(decision, code, blocks) + "}";
+    return "{" + CHAT_200 + ",\"shashu\":" + envelope(decision, code, blocks) + "}";
   }
 
   static String refused(String code, String message, String blocks) {
@@ -97,7 +97,7 @@ class FileMemoryRouteTest {
         + "\",\"type\":\"permission_error\",\"param\":null,"
         + "\"code\":\""
         + code
-        + "\",\"trustgate\":"
+        + "\",\"shashu\":"
         + envelope("refuse", code, blocks)
         + "},\"choices\":[]}";
   }
@@ -118,7 +118,7 @@ class FileMemoryRouteTest {
                   headers(
                       "not_checked",
                       "attachment_uninspected",
-                      "x-trustgate-attachments",
+                      "x-shashu-attachments",
                       "total=2;scanned=1;not_inspected=1;blocked=0")),
           "file_blocked",
               new Scenario(
@@ -130,7 +130,7 @@ class FileMemoryRouteTest {
                   headers(
                       "refuse",
                       "file_policy",
-                      "x-trustgate-attachments",
+                      "x-shashu-attachments",
                       "total=1;scanned=0;not_inspected=0;blocked=1")),
           "memory_blocked",
               new Scenario(
@@ -142,7 +142,7 @@ class FileMemoryRouteTest {
                   headers(
                       "refuse",
                       "tool_policy",
-                      "x-trustgate-memory",
+                      "x-shashu-memory",
                       "writes=1;blocked=1;recalls=0;flagged=0")),
           "route_blocked",
               new Scenario(
@@ -161,9 +161,9 @@ class FileMemoryRouteTest {
                   headers(
                       "not_checked",
                       "attachment_uninspected",
-                      "x-trustgate-attachments",
+                      "x-shashu-attachments",
                       "total=3;scanned=1;not_inspected=1;blocked=0",
-                      "x-trustgate-memory",
+                      "x-shashu-memory",
                       "writes=2;blocked=0;recalls=4;flagged=1")));
 
   static ShashuDecision read(String name) {
@@ -185,7 +185,7 @@ class FileMemoryRouteTest {
     }
 
     @Test
-    void restore_key_is_readable_from_trustgate_extra_fields() {
+    void restore_key_is_readable_from_shashu_extra_fields() {
       String attachments =
           "{\"total\":1,\"scanned\":1,\"scanned_partial\":0,\"not_inspected\":0,\"blocked\":0,"
               + "\"items\":[{\"filename\":\"a.pdf\",\"note\":\"This PDF contains placeholders such as <PERSON_1> "
@@ -203,7 +203,7 @@ class FileMemoryRouteTest {
         throw new AssertionError(e);
       }
       com.fasterxml.jackson.databind.JsonNode item =
-          root.path("trustgate").path("attachments").path("items").get(0);
+          root.path("shashu").path("attachments").path("items").get(0);
       assertTrue(item.path("note").asText().contains("This PDF contains placeholders"));
       assertEquals("alice@corp.example", item.path("key").get(0).path("value").asText());
     }
@@ -265,7 +265,7 @@ class FileMemoryRouteTest {
     void the_body_wins_over_the_header() {
       Scenario s = SCENARIOS.get("file_flagged");
       Map<String, String> h = new LinkedHashMap<>(s.headers());
-      h.put("x-trustgate-attachments", "total=9;scanned=9;not_inspected=0;blocked=0");
+      h.put("x-shashu-attachments", "total=9;scanned=9;not_inspected=0;blocked=0");
       ShashuDecision d = Shashu.decisionFrom(s.body(), h);
       assertEquals("body", d.attachments().carrier());
       assertEquals(2, d.attachments().total());
@@ -384,13 +384,13 @@ class FileMemoryRouteTest {
                   + ",\"made_up_top_level_field\":{\"nested\":[\"x\"]}");
       ShashuDecision d =
           Shashu.decisionFrom(
-              "{\"error\":{\"message\":\"m\",\"trustgate\":" + env + "}}",
+              "{\"error\":{\"message\":\"m\",\"shashu\":" + env + "}}",
               headers(
                   "refuse",
                   "made_up_code_zz",
-                  "x-trustgate-attachments",
+                  "x-shashu-attachments",
                   "total=2;scanned=1;not_inspected=1;blocked=0;made_up=4",
-                  "x-trustgate-memory",
+                  "x-shashu-memory",
                   "writes=1;blocked=1;made_up=9"));
       assertEquals("made_up_code_zz", d.code());
       Attachment item = d.attachments().items().get(0);
@@ -408,7 +408,7 @@ class FileMemoryRouteTest {
     void wrongly_typed_blocks_are_ignored_not_thrown() {
       ShashuDecision d =
           Shashu.decisionFrom(
-              "{\"trustgate\":"
+              "{\"shashu\":"
                   + envelope(
                       "allow", null, "\"attachments\":\"x\",\"memory\":[1],\"route_policy\":5")
                   + "}",
@@ -418,7 +418,7 @@ class FileMemoryRouteTest {
       assertNull(d.routePolicy());
       d =
           Shashu.decisionFrom(
-              "{\"trustgate\":"
+              "{\"shashu\":"
                   + envelope(
                       "allow",
                       null,
@@ -439,9 +439,9 @@ class FileMemoryRouteTest {
               headers(
                   "allow",
                   null,
-                  "x-trustgate-attachments",
+                  "x-shashu-attachments",
                   "total=;scanned=x;;=3",
-                  "x-trustgate-memory",
+                  "x-shashu-memory",
                   "nonsense"));
       assertEquals("allow", d.decision());
       assertNull(d.attachments());

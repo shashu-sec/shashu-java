@@ -16,7 +16,7 @@ import java.util.Map;
  *   <li><b>{@code explicit}</b> (the default at contract {@code 2026-09-01}) — <b>HTTP 400</b>,
  *       {@code error.type "content_filter"} and {@code error.code} naming the finding. This
  *       exception, with the plain-English sentence as its message. Since 0.3.0-alpha the SDK
- *       declares {@code trustgate-version: 2026-09-01} on every request ({@link
+ *       declares {@code shashu-version: 2026-09-01} on every request ({@link
  *       ShashuClient#DEFAULT_CONTRACT_VERSION}), so this is the default path.
  *   <li><b>{@code compatible} / legacy</b> — <b>HTTP 200</b>, {@code finish_reason
  *       "content_filter"} on the choice. This exception. Reached when the account's operator chose
@@ -54,7 +54,7 @@ import java.util.Map;
  *     "type": "content_filter",
  *     "param": null,
  *     "code": "jailbreak",
- *     "trustgate": { "decision": "block", "code": "jailbreak", ... }
+ *     "shashu": { "decision": "block", "code": "jailbreak", ... }
  *   },
  *   "choices": []
  * }
@@ -139,7 +139,7 @@ public final class ShashuContentFilterException extends ShashuException {
           message = content.asText();
         }
       }
-      JsonNode codeNode = root.path("trustgate").path("code");
+      JsonNode codeNode = root.path("shashu").path("code");
       if (codeNode.isTextual()) {
         code = codeNode.asText();
       }

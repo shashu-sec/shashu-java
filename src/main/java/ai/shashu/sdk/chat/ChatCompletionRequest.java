@@ -40,7 +40,7 @@ public final class ChatCompletionRequest {
 
   /**
    * Stored separately so the streaming / future re-builder paths can carry the typed RagContext
-   * through. Serialised under {@code trustgate_metadata.rag_context} via the merged-payload getter.
+   * through. Serialised under {@code shashu_metadata.rag_context} via the merged-payload getter.
    */
   @com.fasterxml.jackson.annotation.JsonIgnore private final RagContext ragContext;
 
@@ -106,18 +106,18 @@ public final class ChatCompletionRequest {
     return ragContext;
   }
 
-  /** Extra keys merged into {@code x-trustgate-metadata}. */
+  /** Extra keys merged into {@code x-shashu-metadata}. */
   public Map<String, Object> trustGateMetadataExtras() {
     return trustGateMetadataExtras;
   }
 
   /**
-   * Computed-at-serialisation merged {@code trustgate_metadata} blob. Combines {@link
+   * Computed-at-serialisation merged {@code shashu_metadata} blob. Combines {@link
    * #trustGateMetadataExtras()} with {@link #ragContext()} so the gateway's ingress-rag scanner has
    * structured retrieval data to work with. Returns null when both are absent so the field is
    * omitted from the JSON body (NON_NULL include).
    */
-  @JsonProperty("trustgate_metadata")
+  @JsonProperty("shashu_metadata")
   public Map<String, Object> trustGateMetadataPayload() {
     if (ragContext == null
         && (trustGateMetadataExtras == null || trustGateMetadataExtras.isEmpty())) {
@@ -224,7 +224,7 @@ public final class ChatCompletionRequest {
     }
 
     /**
-     * Free-form metadata sent under {@code trustgate_metadata} in the request body. Use for
+     * Free-form metadata sent under {@code shashu_metadata} in the request body. Use for
      * control-plane fields the gateway adds after this SDK release without us having to ship typed
      * setters. Composable with {@link #ragContext}.
      */

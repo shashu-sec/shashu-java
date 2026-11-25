@@ -36,17 +36,16 @@ class UnknownValuesToleratedTest {
 
   static final Map<String, String> HEADERS =
       Map.of(
-          "x-trustgate-decision", "refuse",
-          "x-trustgate-code", "made_up_code_zz",
-          "x-trustgate-attachments", "total=1;blocked=1;made_up=2",
-          "x-trustgate-memory", "writes=1;made_up=2",
-          "x-trustgate-made-up-header", "zz");
+          "x-shashu-decision", "refuse",
+          "x-shashu-code", "made_up_code_zz",
+          "x-shashu-attachments", "total=1;blocked=1;made_up=2",
+          "x-shashu-memory", "writes=1;made_up=2",
+          "x-shashu-made-up-header", "zz");
 
   @Test
   void decisionFrom_reads_made_up_values_without_throwing() {
     ShashuDecision d =
-        Shashu.decisionFrom(
-            "{\"error\":{\"message\":\"m\",\"trustgate\":" + ENVELOPE + "}}", HEADERS);
+        Shashu.decisionFrom("{\"error\":{\"message\":\"m\",\"shashu\":" + ENVELOPE + "}}", HEADERS);
     assertNotNull(d);
     assertEquals("refuse", d.decision());
     assertEquals("made_up_code_zz", d.code());
@@ -54,8 +53,7 @@ class UnknownValuesToleratedTest {
 
   @Test
   void a_made_up_decision_is_still_a_block() {
-    String body =
-        "{\"trustgate\":" + ENVELOPE.replace("\"refuse\"", "\"made_up_decision_zz\"") + "}";
+    String body = "{\"shashu\":" + ENVELOPE.replace("\"refuse\"", "\"made_up_decision_zz\"") + "}";
     assertEquals("made_up_decision_zz", Shashu.decisionFrom(body, null).decision());
     assertEquals(true, Shashu.isBlock(body));
   }
@@ -71,7 +69,7 @@ class UnknownValuesToleratedTest {
               .setHeader("Content-Type", "application/json")
               .setBody(
                   "{\"error\":{\"message\":\"m\",\"type\":\"permission_error\",\"code\":\"made_up_code_zz\","
-                      + "\"trustgate\":"
+                      + "\"shashu\":"
                       + ENVELOPE
                       + "}}");
       HEADERS.forEach(r::setHeader);
@@ -97,12 +95,12 @@ class UnknownValuesToleratedTest {
           new MockResponse()
               .setResponseCode(200)
               .setHeader("Content-Type", "application/json")
-              .setHeader("x-trustgate-decision", "allow")
+              .setHeader("x-shashu-decision", "allow")
               .setBody(
                   "{\"id\":\"c1\",\"object\":\"chat.completion\",\"created\":1,\"model\":\"gpt-4o\","
                       + "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"ok\"},"
                       + "\"finish_reason\":\"stop\"}],\"made_up_body_field\":{\"x\":1},"
-                      + "\"trustgate\":"
+                      + "\"shashu\":"
                       + ENVELOPE.replace("\"refuse\"", "\"allow\"")
                       + "}"));
       try (ShashuClient client = client(server)) {

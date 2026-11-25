@@ -25,8 +25,8 @@ class SessionResolutionTests {
 
   private static final Map<String, String> INBOUND =
       Map.of(
-          "x-trustgate-trace-id", "flow",
-          "x-trustgate-session-id", "captured");
+          "x-shashu-trace-id", "flow",
+          "x-shashu-session-id", "captured");
 
   @Test
   void per_request_is_an_instruction_that_beats_a_captured_inbound() {
@@ -60,11 +60,11 @@ class SessionResolutionTests {
     try (Tracer.A2aScope ignored = Tracer.incoming(INBOUND)) {
       // Handed an explicit session: that is what is stamped.
       assertEquals(
-          "explicit", WorkflowContext.build(null, null, "explicit").get("x-trustgate-session-id"));
+          "explicit", WorkflowContext.build(null, null, "explicit").get("x-shashu-session-id"));
 
       // Handed nothing: the caller resolved to no session, so none is
       // stamped. build() must NOT reach into the tracer to supply one.
-      assertFalse(WorkflowContext.build(null, null, null).containsKey("x-trustgate-session-id"));
+      assertFalse(WorkflowContext.build(null, null, null).containsKey("x-shashu-session-id"));
     }
   }
 
@@ -73,7 +73,7 @@ class SessionResolutionTests {
       "the no-arg overload resolves at its own entry, so manual header building still propagates")
   void the_no_arg_overload_still_propagates_a_captured_session() {
     try (Tracer.A2aScope ignored = Tracer.incoming(INBOUND)) {
-      assertEquals("captured", WorkflowContext.build().get("x-trustgate-session-id"));
+      assertEquals("captured", WorkflowContext.build().get("x-shashu-session-id"));
     }
   }
 }

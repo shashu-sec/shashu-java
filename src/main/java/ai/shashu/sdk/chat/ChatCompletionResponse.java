@@ -12,9 +12,9 @@ import java.util.Map;
 
 /**
  * OpenAI-compatible chat-completions response. The Shashu-specific security verdict / audit
- * metadata is attached as {@code x-trustgate-*} response headers, not in the JSON body — same as
- * the .NET / Python / Node SDKs. A top-level {@code trustgate} envelope, when present, is retained
- * in {@link #extraFields()} so {@code Shashu.decisionOf} can read the body carrier.
+ * metadata is attached as {@code x-shashu-*} response headers, not in the JSON body — same as the
+ * .NET / Python / Node SDKs. A top-level {@code trustgate} envelope, when present, is retained in
+ * {@link #extraFields()} so {@code Shashu.decisionOf} can read the body carrier.
  */
 public final class ChatCompletionResponse {
 
@@ -93,8 +93,8 @@ public final class ChatCompletionResponse {
   }
 
   /**
-   * {@code x-trustgate-*} (and sibling) response headers captured from the HTTP response. Empty
-   * when the object was not built by this SDK.
+   * {@code x-shashu-*} (and sibling) response headers captured from the HTTP response. Empty when
+   * the object was not built by this SDK.
    */
   public Map<String, String> trustGateHeaders() {
     return trustGateHeaders;

@@ -155,29 +155,29 @@ public final class MockGateway implements Interceptor {
       }
     }
 
-    /** Whether the request carried a {@code trustgate_metadata} key at all. */
+    /** Whether the request carried a {@code shashu_metadata} key at all. */
     public boolean hasShashuMetadata() {
       JsonNode json = json();
-      return json != null && json.hasNonNull("trustgate_metadata");
+      return json != null && json.hasNonNull("shashu_metadata");
     }
 
-    /** The {@code trustgate_metadata.rag_context} block, or null if the request carried none. */
+    /** The {@code shashu_metadata.rag_context} block, or null if the request carried none. */
     public JsonNode ragContext() {
       JsonNode json = json();
       if (json == null) {
         return null;
       }
-      JsonNode metadata = json.get("trustgate_metadata");
+      JsonNode metadata = json.get("shashu_metadata");
       return metadata != null && metadata.isObject() ? metadata.get("rag_context") : null;
     }
 
-    /** The {@code trustgate_metadata.memory_context} block, or null. */
+    /** The {@code shashu_metadata.memory_context} block, or null. */
     public JsonNode memoryContext() {
       JsonNode json = json();
       if (json == null) {
         return null;
       }
-      JsonNode metadata = json.get("trustgate_metadata");
+      JsonNode metadata = json.get("shashu_metadata");
       return metadata != null && metadata.isObject() ? metadata.get("memory_context") : null;
     }
 

@@ -20,7 +20,7 @@ public final class ProviderPatch {
   private ProviderPatch() {}
 
   /**
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
    * @return an interceptor to add to an {@code OkHttpClient.Builder}
    * @deprecated Use {@link GatewayRouting#asInterceptor(String)}.
    */
@@ -30,9 +30,8 @@ public final class ProviderPatch {
   }
 
   /**
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
-   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
+   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping, or {@code null}
    * @return an interceptor to add to an {@code OkHttpClient.Builder}
    * @deprecated Use {@link GatewayRouting#asInterceptor(String, String, String)}.
@@ -44,7 +43,7 @@ public final class ProviderPatch {
   }
 
   /**
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
    * @return an {@code OkHttpClient} whose provider traffic goes to the gateway
    * @deprecated Use {@link GatewayRouting#newOkHttpClient(String)}.
    */
@@ -54,9 +53,8 @@ public final class ProviderPatch {
   }
 
   /**
-   * @param apiKey Shashu API key, or {@code null} to read {@code TRUSTGATE_API_KEY}
-   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   * @param apiKey Shashu API key, or {@code null} to read {@code SHASHU_API_KEY}
+   * @param gatewayBaseUrl the gateway address; {@code null} falls back to {@code SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping, or {@code null}
    * @return an {@code OkHttpClient} whose provider traffic goes to the gateway
    * @deprecated Use {@link GatewayRouting#newOkHttpClient(String, String, String)}.

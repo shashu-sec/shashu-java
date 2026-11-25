@@ -10,7 +10,7 @@ import ai.shashu.sdk.internal.ShashuConfig;
  * Same unit-of-work shape as {@link Retrieval}.
  *
  * <p>There are exactly two members here. Collectors are not shipped in this release. Both members
- * are no-ops when {@code TRUSTGATE_DISABLE=1}.
+ * are no-ops when {@code SHASHU_DISABLE=1}.
  */
 public final class Memory {
 

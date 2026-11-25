@@ -13,13 +13,12 @@ import org.junit.jupiter.api.Test;
  *
  * <p>Sibling of the Python SDK's {@code Decision.inspection} and the Node SDK's {@code
  * decision.inspection}: the same shape — {@code input}, {@code output}, {@code reason} and a {@code
- * detectors} map — whether it was read off the body or off the {@code x-trustgate-inspection}
- * header.
+ * detectors} map — whether it was read off the body or off the {@code x-shashu-inspection} header.
  */
 class InspectionTest {
 
   static String body(String inspection) {
-    return "{\"trustgate\":{\"decision\":\"allow\",\"id\":\"r1\""
+    return "{\"shashu\":{\"decision\":\"allow\",\"id\":\"r1\""
         + (inspection == null ? "" : ",\"inspection\":" + inspection)
         + "}}";
   }
@@ -48,9 +47,9 @@ class InspectionTest {
   @Test
   void header_memory_detector_is_collected_under_detectors() {
     Map<String, String> h = new LinkedHashMap<>();
-    h.put("x-trustgate-decision", "allow");
+    h.put("x-shashu-decision", "allow");
     h.put(
-        "x-trustgate-inspection",
+        "x-shashu-inspection",
         "input=checked;output=skipped;reason=adapter_unreachable;memory=partial");
     ShashuDecision d = Shashu.decisionFrom(null, h);
     assertEquals("partial", memory(d));

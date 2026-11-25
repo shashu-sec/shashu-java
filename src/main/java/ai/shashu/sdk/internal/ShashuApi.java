@@ -66,7 +66,7 @@ public final class ShashuApi {
 
   /**
    * This agent's OWN id (ADR-007 §4.1). Seeded from {@link ShashuClientOptions#agentId()} and
-   * refreshed from each gateway response's {@code x-trustgate-agent-id} header (read on EVERY
+   * refreshed from each gateway response's {@code x-shashu-agent-id} header (read on EVERY
    * response, including non-2xx). Used by {@code ShashuClient.buildInvocationHeaders} to stamp
    * caller = self on a downstream invocation — never sent as the gateway call's caller. Advisory
    * lineage, never auth. {@code volatile} because a long-lived client is shared across threads.
@@ -128,12 +128,12 @@ public final class ShashuApi {
   }
 
   /**
-   * Cache this agent's own id from the gateway's {@code x-trustgate-agent-id} response header, when
+   * Cache this agent's own id from the gateway's {@code x-shashu-agent-id} response header, when
    * present. Called on EVERY response (success + error) so even a blocked response seeds the
    * self-id for the next A2A invocation. Fail-soft: never throws.
    */
   private void captureAgentId(Response response) {
-    String aid = response.header("x-trustgate-agent-id");
+    String aid = response.header("x-shashu-agent-id");
     if (aid != null && !aid.isBlank()) {
       this.agentId = aid;
     }
@@ -203,17 +203,21 @@ public final class ShashuApi {
         // breakers — SDK-side 5xx retries stack on top and amplify load
         // during an incident. 4xx (incl. 403 policy blocks) never retry.
         boolean is5xx = status >= 500 && status < 600;
-        boolean retryable = status == 429 || (options.legacyRetryPolicy() && is5xx);
-        if (!retryable || attempt >= options.maxRetries()) {
+        boolean invited =
+            truthy(response.header("x-should-retry"))
+                || parseRetryAfterMillis(response.header("Retry-After")) != null;
+        boolean busy = (status == 429 || status == 503) && invited;
+        boolean retryable = busy || (options.legacyRetryPolicy() && is5xx && status != 503);
+        if (options.maxRetries() <= 0 || !retryable || attempt >= options.maxRetries()) {
           throw ShashuException.fromResponse(status, responseBody).attachResponseHeaders(headers);
         }
 
-        // Honor Retry-After on 429 unless the legacy policy is active.
         Long retryAfterMillis =
-            (status == 429 && !options.legacyRetryPolicy())
+            (busy && !options.legacyRetryPolicy())
                 ? parseRetryAfterMillis(response.header("Retry-After"))
                 : null;
-        delayMillis = retryAfterMillis != null ? retryAfterMillis : backoffMillis(attempt);
+        delayMillis =
+            withJitter(retryAfterMillis != null ? retryAfterMillis : backoffMillis(attempt));
       } catch (IOException e) {
         // Connection-level failure — the request never received a
         // response, so a retry can't duplicate a side effect. Always
@@ -237,6 +241,21 @@ public final class ShashuApi {
   /** Exponential backoff with jitter: 250ms, 500ms, 1s, capped at 2s. */
   private static long backoffMillis(int attempt) {
     return Math.min(2000L, 250L * (1L << attempt)) + ThreadLocalRandom.current().nextLong(0, 100);
+  }
+
+  private static boolean truthy(String value) {
+    if (value == null || value.isBlank()) {
+      return false;
+    }
+    String v = value.trim().toLowerCase(java.util.Locale.ROOT);
+    return v.equals("1") || v.equals("true") || v.equals("yes") || v.equals("on");
+  }
+
+  /** Retry-After (or backoff) plus 0–20% jitter, capped at 30s. */
+  private static long withJitter(long millis) {
+    long capped = Math.min(30_000L, Math.max(0L, millis));
+    long extra = (long) (capped * 0.2 * ThreadLocalRandom.current().nextDouble());
+    return Math.min(30_000L, capped + extra);
   }
 
   /**
@@ -380,7 +399,7 @@ public final class ShashuApi {
     Headers h = response.headers();
     for (int i = 0; i < h.size(); i++) {
       String name = h.name(i);
-      if (name.regionMatches(true, 0, "x-trustgate-", 0, "x-trustgate-".length())
+      if (name.regionMatches(true, 0, "x-shashu-", 0, "x-shashu-".length())
           || name.equalsIgnoreCase("x-should-retry")
           || name.equalsIgnoreCase("x-request-id")) {
         out.put(name, h.value(i));

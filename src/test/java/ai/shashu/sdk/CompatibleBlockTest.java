@@ -15,8 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * The 200-encoded block. Since 0.3.0-alpha this SDK declares {@code trustgate-version: 2026-09-01},
- * so a block arrives as a 400 by default; the 200 shape is still reachable when a caller opts out
+ * The 200-encoded block. Since 0.3.0-alpha this SDK declares {@code shashu-version: 2026-09-01}, so
+ * a block arrives as a 400 by default; the 200 shape is still reachable when a caller opts out
  * ({@code contractVersion(null)}) on an account served the legacy contract, or on an account whose
  * operator set the {@code compatible} encoding. It fires, and it must throw. Body is {@code
  * tests/golden_wire/chat_blocked_content_filter.golden.json}.
@@ -80,8 +80,8 @@ class CompatibleBlockTest {
       client.chat().completions().create(req());
     }
     var seen = server.takeRequest();
-    assertEquals("2026-09-01", seen.getHeader("trustgate-version"));
-    assertEquals(null, seen.getHeader("trustgate-block-encoding"));
+    assertEquals("2026-09-01", seen.getHeader("shashu-version"));
+    assertEquals(null, seen.getHeader("shashu-block-encoding"));
   }
 
   @Test
@@ -97,8 +97,8 @@ class CompatibleBlockTest {
           ShashuContentFilterException.class, () -> client.chat().completions().create(req()));
     }
     var seen = server.takeRequest();
-    assertEquals(null, seen.getHeader("trustgate-version"));
-    assertEquals(null, seen.getHeader("trustgate-block-encoding"));
+    assertEquals(null, seen.getHeader("shashu-version"));
+    assertEquals(null, seen.getHeader("shashu-block-encoding"));
   }
 
   @Test

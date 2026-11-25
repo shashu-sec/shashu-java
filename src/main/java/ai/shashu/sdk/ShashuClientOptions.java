@@ -44,7 +44,7 @@ public final class ShashuClientOptions {
   }
 
   /**
-   * @param contractVersion the {@code trustgate-version} to declare; {@code null} or blank sends no
+   * @param contractVersion the {@code shashu-version} to declare; {@code null} or blank sends no
    *     such header
    */
   public ShashuClientOptions(
@@ -123,7 +123,7 @@ public final class ShashuClientOptions {
     return maxRetries;
   }
 
-  /** Optional {@code x-trustgate-organization-id} header value. */
+  /** Optional {@code x-shashu-organization-id} header value. */
   public String organizationId() {
     return organizationId;
   }
@@ -136,8 +136,8 @@ public final class ShashuClientOptions {
   /**
    * This agent's OWN id (ADR-007 §4.1), used as the {@code caller-agent-id} when this agent INVOKES
    * a downstream agent via {@link ShashuClient#buildInvocationHeaders()}. Optional: if unset, the
-   * client caches it from the {@code x-trustgate-agent-id} response header on the first gateway
-   * call. Advisory lineage, never an auth credential. May be null.
+   * client caches it from the {@code x-shashu-agent-id} response header on the first gateway call.
+   * Advisory lineage, never an auth credential. May be null.
    */
   public String agentId() {
     return agentId;
@@ -154,8 +154,8 @@ public final class ShashuClientOptions {
   }
 
   /**
-   * The {@code trustgate-version} header value sent on every request, or {@code null} when the
-   * caller opted out. See {@link ShashuClient#DEFAULT_CONTRACT_VERSION}.
+   * The {@code shashu-version} header value sent on every request, or {@code null} when the caller
+   * opted out. See {@link ShashuClient#DEFAULT_CONTRACT_VERSION}.
    */
   public String contractVersion() {
     return contractVersion;

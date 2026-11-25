@@ -27,7 +27,7 @@ class DecisionTest {
   @ValueSource(strings = {"allow", "allow_altered", "not_checked", "block", "refuse", "fail"})
   void decisionFrom_body_surfaces_each_of_the_six(String decision) {
     String body =
-        "{\"trustgate\":{\"decision\":\"" + decision + "\",\"retryable\":false,\"id\":\"i\"}}";
+        "{\"shashu\":{\"decision\":\"" + decision + "\",\"retryable\":false,\"id\":\"i\"}}";
     ShashuDecision read = Shashu.decisionFrom(body, null);
     assertNotNull(read);
     assertEquals(decision, read.decision());
@@ -36,7 +36,7 @@ class DecisionTest {
   @ParameterizedTest
   @ValueSource(strings = {"allow", "allow_altered", "not_checked", "block", "refuse", "fail"})
   void decisionFrom_headers_surfaces_each_of_the_six(String decision) {
-    Map<String, String> headers = Map.of("x-trustgate-decision", decision);
+    Map<String, String> headers = Map.of("x-shashu-decision", decision);
     ShashuDecision read = Shashu.decisionFrom(null, headers);
     assertNotNull(read);
     assertEquals(decision, read.decision());
@@ -74,7 +74,7 @@ class DecisionTest {
     "brand_new_this_week, true"
   })
   void isBlock_reads_decision_only_and_fails_closed(String decision, boolean blocked) {
-    String body = "{\"trustgate\":{\"decision\":\"" + decision + "\"}}";
+    String body = "{\"shashu\":{\"decision\":\"" + decision + "\"}}";
     assertEquals(blocked, Shashu.isBlock(body));
   }
 
@@ -95,7 +95,7 @@ class DecisionTest {
   @ParameterizedTest
   @CsvSource({"refuse, false", "fail, false"})
   void refuse_and_fail_are_not_content_blocks(String decision, boolean blocked) {
-    String body = "{\"trustgate\":{\"decision\":\"" + decision + "\"}}";
+    String body = "{\"shashu\":{\"decision\":\"" + decision + "\"}}";
     assertEquals(blocked, Shashu.isBlock(body));
   }
 
@@ -107,14 +107,14 @@ class DecisionTest {
   @CsvSource({"brand_new_this_week, also_brand_new, true", "allow, also_brand_new, false"})
   void unknown_code_does_not_override_decision_fail_closed(
       String decision, String code, boolean blocked) {
-    String body = "{\"trustgate\":{\"decision\":\"" + decision + "\",\"code\":\"" + code + "\"}}";
+    String body = "{\"shashu\":{\"decision\":\"" + decision + "\",\"code\":\"" + code + "\"}}";
     assertEquals(blocked, Shashu.isBlock(body));
   }
 
   @Test
-  void nested_error_trustgate_is_the_error_carrier() {
+  void nested_error_shashu_is_the_error_carrier() {
     String body =
-        "{\"error\":{\"type\":\"content_filter\",\"trustgate\":{\"decision\":\"block\",\"code\":\"jailbreak\"}}}";
+        "{\"error\":{\"type\":\"content_filter\",\"shashu\":{\"decision\":\"block\",\"code\":\"jailbreak\"}}}";
     ShashuDecision read = Shashu.decisionFrom(body, null);
     assertEquals("block", read.decision());
     assertEquals("jailbreak", read.code());
@@ -123,7 +123,7 @@ class DecisionTest {
 
   @Test
   void envelope_without_a_readable_decision_fails_closed() {
-    String body = "{\"trustgate\":{\"retryable\":false}}";
+    String body = "{\"shashu\":{\"retryable\":false}}";
     assertNull(Shashu.decisionFrom(body, null));
     assertTrue(Shashu.isBlock(body));
   }
@@ -148,7 +148,7 @@ class DecisionTest {
                   "{\"id\":\"c1\",\"object\":\"chat.completion\",\"created\":1,\"model\":\"gpt-4o\","
                       + "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"ok\"},"
                       + "\"finish_reason\":\"stop\"}],"
-                      + "\"trustgate\":{\"decision\":\"allow_altered\",\"code\":\"dlp\"}}"));
+                      + "\"shashu\":{\"decision\":\"allow_altered\",\"code\":\"dlp\"}}"));
       try (ShashuClient client =
           ShashuClient.builder()
               .apiKey("sk-trustgate-test")
@@ -181,7 +181,7 @@ class DecisionTest {
           new MockResponse()
               .setResponseCode(200)
               .setHeader("Content-Type", "application/json")
-              .setHeader("x-trustgate-decision", "refuse")
+              .setHeader("x-shashu-decision", "refuse")
               .setBody(
                   "{\"id\":\"c1\",\"object\":\"chat.completion\",\"created\":1,\"model\":\"gpt-4o\","
                       + "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"ok\"},"

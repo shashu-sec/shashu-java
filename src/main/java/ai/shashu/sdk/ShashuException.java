@@ -31,7 +31,7 @@ public class ShashuException extends RuntimeException {
   /** Raw response body as returned by the gateway, or empty if no response. */
   private final String responseBody;
 
-  /** {@code x-trustgate-*} headers captured from the HTTP response. Empty when none. */
+  /** {@code x-shashu-*} headers captured from the HTTP response. Empty when none. */
   private Map<String, String> responseHeaders = Map.of();
 
   /** Transport or HTTP error from the gateway. */
@@ -95,7 +95,7 @@ public class ShashuException extends RuntimeException {
    *   <li>400 carrying {@code error.type} {@code "content_filter"} &rarr; {@link
    *       ShashuContentFilterException}.
    *   <li>everything else &rarr; {@link ShashuException}. When the body is the gateway's own
-   *       refusal under a contract version (it carries the {@code error.trustgate} envelope: a 402
+   *       refusal under a contract version (it carries the {@code error.shashu} envelope: a 402
    *       plan limit, a 429 quota, a 503 fail-closed scan), the message is its plain-English {@code
    *       error.message}; otherwise it is the status and a body snippet.
    * </ul>
@@ -145,10 +145,10 @@ public class ShashuException extends RuntimeException {
    * The plain-English {@code error.message} of a gateway refusal served under a contract version,
    * or {@code null} when the body is not one.
    *
-   * <p>Only a body carrying the nested {@code error.trustgate} envelope counts: that is the
-   * gateway's own refusal (402 plan limit, 429 quota, 503 fail-closed, …), whose message was
-   * written for the person reading it. Without the envelope the body could be anything, a provider
-   * error or a proxy page, so the status-and-snippet message stays.
+   * <p>Only a body carrying the nested {@code error.shashu} envelope counts: that is the gateway's
+   * own refusal (402 plan limit, 429 quota, 503 fail-closed, …), whose message was written for the
+   * person reading it. Without the envelope the body could be anything, a provider error or a proxy
+   * page, so the status-and-snippet message stays.
    */
   private static String contractSentence(String body) {
     if (body == null || body.isEmpty()) {
@@ -156,7 +156,7 @@ public class ShashuException extends RuntimeException {
     }
     try {
       JsonNode err = CONTENT_FILTER_MAPPER.readTree(body).path("error");
-      if (!err.isObject() || !err.path("trustgate").isObject()) {
+      if (!err.isObject() || !err.path("shashu").isObject()) {
         return null;
       }
       String message = err.path("message").asText(null);

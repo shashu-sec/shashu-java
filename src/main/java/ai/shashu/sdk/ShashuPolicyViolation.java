@@ -64,7 +64,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * <p>Under the contract this SDK declares by default, a 403 carries {@code error.type
  * "permission_error"}, a reason in {@code error.code} ({@code tool_policy}, {@code
  * feature_disabled}, {@code route_data_policy}, …) and the decision envelope nested in {@code
- * error.trustgate}. The body below is the legacy contract's shape, which a caller still sees after
+ * error.shashu}. The body below is the legacy contract's shape, which a caller still sees after
  * opting out of the version header.
  *
  * <p>Access decision on the legacy contract, on {@code /v1/chat/completions}, {@code

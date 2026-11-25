@@ -369,7 +369,7 @@ public final class RetrievalBus {
     return new RetrievalScopeHandle(opened, previous);
   }
 
-  /** The handle {@code TRUSTGATE_DISABLE=1} hands back. */
+  /** The handle {@code SHASHU_DISABLE=1} hands back. */
   public static RetrievalScopeHandle inertScope() {
     return RetrievalScopeHandle.INERT;
   }

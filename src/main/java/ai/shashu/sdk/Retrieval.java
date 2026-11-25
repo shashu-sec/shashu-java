@@ -10,8 +10,8 @@ import ai.shashu.sdk.internal.ShashuConfig;
  * happened.
  *
  * <p>There are exactly two members here and there is no third, per {@code
- * contracts/sdk-surface.v1.md}. Both are no-ops when {@code TRUSTGATE_DISABLE=1}. The overloads
- * exist because Java has no default arguments; the contract names that form explicitly.
+ * contracts/sdk-surface.v1.md}. Both are no-ops when {@code SHASHU_DISABLE=1}. The overloads exist
+ * because Java has no default arguments; the contract names that form explicitly.
  *
  * <p><b>Calling it.</b> The type is a holder &mdash; Java has no free functions, so the two entry
  * points need one. It is named for what it does rather than for the product, so the qualifier does

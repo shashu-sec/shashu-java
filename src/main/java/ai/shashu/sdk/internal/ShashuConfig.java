@@ -14,9 +14,9 @@ import java.util.Set;
  * is a copy that drifts.
  *
  * <p><b>There is no default gateway address.</b> Resolution is explicit option &rarr; {@code
- * TRUSTGATE_BASE_URL} &rarr; {@link ShashuConfigException}. See that class for why.
+ * SHASHU_BASE_URL} &rarr; {@link ShashuConfigException}. See that class for why.
  *
- * <p><b>{@code TRUSTGATE_DISABLE=1} turns the SDK off</b> without a code change, so a platform team
+ * <p><b>{@code SHASHU_DISABLE=1} turns the SDK off</b> without a code change, so a platform team
  * can stop the instrumentation of a deployed service from its environment. It is checked at every
  * entry point that patches a third-party client, carries a retrieval declaration, or sends
  * telemetry.
@@ -32,14 +32,10 @@ public final class ShashuConfig {
   /** Environment variable holding the gateway address. {@code SHASHU_*} wins. */
   public static final String BASE_URL_ENV = "SHASHU_BASE_URL";
 
-  public static final String BASE_URL_ENV_LEGACY = "TRUSTGATE_BASE_URL";
   public static final String API_KEY_ENV = "SHASHU_API_KEY";
-  public static final String API_KEY_ENV_LEGACY = "TRUSTGATE_API_KEY";
 
   /** Set to one of {@link #TRUTHY} to make every entry point a no-op. */
   public static final String DISABLE_ENV = "SHASHU_DISABLE";
-
-  public static final String DISABLE_ENV_LEGACY = "TRUSTGATE_DISABLE";
 
   // Documented as "=1"; the rest are accepted because platform tooling
   // emits them and a kill switch that silently ignores "true" is worse
@@ -57,7 +53,6 @@ public final class ShashuConfig {
   }
 
   private static volatile Env env = System::getenv;
-  private static final Set<String> FALLBACK_WARNED = new HashSet<>();
 
   /** Replace the environment reader. Test seam. */
   static void setEnv(Env replacement) {
@@ -69,43 +64,21 @@ public final class ShashuConfig {
     return current != null ? current.get(name) : null;
   }
 
-  public static String envGet(String current, String legacy) {
-    String value = blankToNull(read(current));
-    if (value != null) {
-      return value;
-    }
-    String legacyValue = blankToNull(read(legacy));
-    if (legacyValue != null) {
-      warnLegacyOnce(legacy, current);
-      return legacyValue;
-    }
-    return null;
+  public static String envGet(String current, String unusedLegacy) {
+    return blankToNull(read(current));
   }
 
   public static String envApiKey() {
-    return envGet(API_KEY_ENV, API_KEY_ENV_LEGACY);
+    return envGet(API_KEY_ENV, null);
   }
 
   private static String blankToNull(String raw) {
     return (raw == null || raw.isBlank()) ? null : raw.trim();
   }
 
-  private static void warnLegacyOnce(String legacy, String current) {
-    synchronized (FALLBACK_WARNED) {
-      if (!FALLBACK_WARNED.add(legacy)) {
-        return;
-      }
-    }
-    System.err.println(
-        legacy
-            + " is deprecated; set "
-            + current
-            + " instead. The TRUSTGATE_* name still works for this release.");
-  }
-
   /** True when the operator has switched the SDK off via the environment. */
   public static boolean isDisabled() {
-    String raw = envGet(DISABLE_ENV, DISABLE_ENV_LEGACY);
+    String raw = envGet(DISABLE_ENV, null);
     return raw != null && TRUTHY.contains(raw.trim().toLowerCase(Locale.ROOT));
   }
 
@@ -117,7 +90,7 @@ public final class ShashuConfig {
     if (explicit != null && !explicit.isBlank()) {
       return explicit.trim();
     }
-    return envGet(BASE_URL_ENV, BASE_URL_ENV_LEGACY);
+    return envGet(BASE_URL_ENV, null);
   }
 
   /**
@@ -128,9 +101,9 @@ public final class ShashuConfig {
    *     ShashuClient.builder().build()}
    * @param argument the argument that would have supplied the address, rendered the way Java passes
    *     it &mdash; {@code .baseUrl(...)}
-   * @throws ShashuConfigException when nothing resolves. The message names {@code
-   *     TRUSTGATE_BASE_URL} and the argument, and never a hostname &mdash; there is no address to
-   *     suggest, so suggesting one is a bug.
+   * @throws ShashuConfigException when nothing resolves. The message names {@code SHASHU_BASE_URL}
+   *     and the argument, and never a hostname &mdash; there is no address to suggest, so
+   *     suggesting one is a bug.
    */
   public static String requireBaseUrl(String explicit, String entryPoint, String argument) {
     String resolved = optionalBaseUrl(explicit);
@@ -146,8 +119,6 @@ public final class ShashuConfig {
             + entryPoint
             + ", or set the "
             + BASE_URL_ENV
-            + " or "
-            + BASE_URL_ENV_LEGACY
             + " environment variable. SHASHU is"
             + " self-hosted: the SDK has no default address and will not guess one.");
   }

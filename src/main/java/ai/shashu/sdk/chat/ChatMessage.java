@@ -14,8 +14,8 @@ import java.util.Objects;
  *
  * <p>The tool-call fields ({@link #toolCalls()}, {@link #toolCallId()}, {@link #name()}) are
  * optional and serialise at the <b>message</b> level — they are part of the provider-forwarded
- * OpenAI payload, unlike {@link RagContext} which rides under {@code trustgate_metadata}. Sending
- * them typed lets the gateway's {@code ingress-tool} scanner read each function name and its
+ * OpenAI payload, unlike {@link RagContext} which rides under {@code shashu_metadata}. Sending them
+ * typed lets the gateway's {@code ingress-tool} scanner read each function name and its
  * JSON-encoded arguments structurally instead of relying on best-effort de-flattening of pasted
  * text. All three fields are omitted from the JSON when unset, so plain {@code (role, content)}
  * messages serialise exactly as they always have.

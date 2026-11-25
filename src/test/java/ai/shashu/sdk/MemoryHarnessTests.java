@@ -88,7 +88,7 @@ class MemoryHarnessTests {
     Memory.declareMemory(List.of(Map.of("id", "ambient", "preview", "ambient")), "ambient_store");
     Map<String, Object> body = chatBody();
     body.put(
-        "trustgate_metadata",
+        "shashu_metadata",
         Map.of(
             "memory_context",
             Map.of(
@@ -104,9 +104,9 @@ class MemoryHarnessTests {
   }
 
   @Test
-  @DisplayName("TRUSTGATE_DISABLE=1 is a no-op")
+  @DisplayName("SHASHU_DISABLE=1 is a no-op")
   void disable_is_a_noop() throws Exception {
-    RetrievalTestAccess.setEnv(Map.of("TRUSTGATE_DISABLE", "1"));
+    RetrievalTestAccess.setEnv(Map.of("SHASHU_DISABLE", "1"));
     Memory.declareMemory(List.of(Map.of("id", "m1", "preview", "hidden")), "agent_notes");
     callModel();
     assertNull(gateway.single().memoryContext());

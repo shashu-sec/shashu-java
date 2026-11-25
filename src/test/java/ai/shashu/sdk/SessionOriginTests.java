@@ -89,8 +89,8 @@ class SessionOriginTests {
         Tracer.A2aScope ignored =
             Tracer.incoming(
                 Map.of(
-                    "x-trustgate-trace-id", "flow",
-                    "x-trustgate-session-id", "captured"))) {
+                    "x-shashu-trace-id", "flow",
+                    "x-shashu-session-id", "captured"))) {
       call(client);
       assertEquals("captured", takeSession());
     }
@@ -103,8 +103,8 @@ class SessionOriginTests {
         Tracer.A2aScope ignored =
             Tracer.incoming(
                 Map.of(
-                    "x-trustgate-trace-id", "flow",
-                    "x-trustgate-session-id", "captured"))) {
+                    "x-shashu-trace-id", "flow",
+                    "x-shashu-session-id", "captured"))) {
       client.chat().completions().create(req(), "per-request");
       assertEquals("per-request", takeSession());
     }
@@ -141,7 +141,7 @@ class SessionOriginTests {
 
   private String takeSession() throws InterruptedException {
     RecordedRequest req = server.takeRequest();
-    return req.getHeader("x-trustgate-session-id");
+    return req.getHeader("x-shashu-session-id");
   }
 
   private static String okBody() {

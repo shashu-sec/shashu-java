@@ -66,13 +66,13 @@ class WorkflowContextTest {
   @Test
   void caller_supplied_workflow_step_wins_when_provided() {
     Map<String, String> headers = WorkflowContext.build("Caller_Override", null);
-    assertEquals("Caller_Override", headers.get("x-trustgate-workflow-step"));
+    assertEquals("Caller_Override", headers.get("x-shashu-workflow-step"));
   }
 
   @Test
   void source_tool_blob_is_valid_json_with_sdk_identification() throws Exception {
     Map<String, String> headers = WorkflowContext.build();
-    String blob = headers.get("x-trustgate-source-tool");
+    String blob = headers.get("x-shashu-source-tool");
     assertNotNull(blob, "source-tool header must always be emitted");
     JsonNode root = mapper.readTree(blob);
     assertEquals("trustgate-java", root.path("sdk").asText());
@@ -84,7 +84,7 @@ class WorkflowContextTest {
   void source_tool_overrides_merge_into_blob() throws Exception {
     Map<String, String> headers =
         WorkflowContext.build(null, Map.of("step_name", "extract", "request_id", "req-42"));
-    JsonNode root = mapper.readTree(headers.get("x-trustgate-source-tool"));
+    JsonNode root = mapper.readTree(headers.get("x-shashu-source-tool"));
     assertEquals("extract", root.path("step_name").asText());
     assertEquals("req-42", root.path("request_id").asText());
     // Default fields preserved:
@@ -131,15 +131,15 @@ class WorkflowContextTest {
 
     RecordedRequest req = server.takeRequest();
     // Mandatory headers (always emitted regardless of env).
-    assertNotNull(req.getHeader("x-trustgate-source"));
-    assertNotNull(req.getHeader("x-trustgate-trace-id"));
-    assertNotNull(req.getHeader("x-trustgate-source-tool"));
+    assertNotNull(req.getHeader("x-shashu-source"));
+    assertNotNull(req.getHeader("x-shashu-trace-id"));
+    assertNotNull(req.getHeader("x-shashu-source-tool"));
     assertNotNull(req.getHeader("x-trustlog-os"));
     assertNotNull(req.getHeader("x-trustlog-arch"));
     assertTrue(req.getHeader("x-trustlog-runtime-version").startsWith("java-"));
 
     // Source-tool is JSON identifying the calling SDK.
-    JsonNode sourceTool = mapper.readTree(req.getHeader("x-trustgate-source-tool"));
+    JsonNode sourceTool = mapper.readTree(req.getHeader("x-shashu-source-tool"));
     assertEquals("trustgate-java", sourceTool.path("sdk").asText());
   }
 }

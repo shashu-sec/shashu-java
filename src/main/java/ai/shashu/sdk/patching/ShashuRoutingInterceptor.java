@@ -26,7 +26,7 @@ public final class ShashuRoutingInterceptor extends ai.shashu.sdk.routing.Shashu
   /**
    * @param apiKey the Shashu API key
    * @param gatewayBaseUrlOverride the gateway address; {@code null} falls back to {@code
-   *     TRUSTGATE_BASE_URL}
+   *     SHASHU_BASE_URL}
    * @param organizationId optional {@code X-Org-Id} scoping
    * @throws ai.shashu.sdk.ShashuConfigException if no address resolves
    * @deprecated Use {@link

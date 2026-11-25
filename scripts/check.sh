@@ -24,10 +24,10 @@ else
 fi
 
 step "jar contents"
-test -f target/shashu-sdk-1.0.0.jar
-test -f target/shashu-sdk-1.0.0-sources.jar
-test -f target/shashu-sdk-1.0.0-javadoc.jar
-if jar tf target/shashu-sdk-1.0.0.jar | grep -E "_internal/|IDENTITY-I4|surefire|src/test"; then
+test -f target/shashu-sdk-1.1.0.jar
+test -f target/shashu-sdk-1.1.0-sources.jar
+test -f target/shashu-sdk-1.1.0-javadoc.jar
+if jar tf target/shashu-sdk-1.1.0.jar | grep -E "_internal/|IDENTITY-I4|surefire|src/test"; then
   exit 1
 fi
 

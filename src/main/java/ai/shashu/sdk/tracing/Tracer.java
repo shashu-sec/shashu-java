@@ -31,9 +31,9 @@ import java.util.function.Supplier;
  * WorkflowContext}):
  *
  * <ul>
- *   <li>{@code x-trustgate-trace-id} — active span's trace id
- *   <li>{@code x-trustgate-span-id} — active span's span id
- *   <li>{@code x-trustgate-parent-id} — active span's parent (empty for root)
+ *   <li>{@code x-shashu-trace-id} — active span's trace id
+ *   <li>{@code x-shashu-span-id} — active span's span id
+ *   <li>{@code x-shashu-parent-id} — active span's parent (empty for root)
  * </ul>
  *
  * <p>Use the tracer to instrument workflow steps:
@@ -130,7 +130,7 @@ public final class Tracer {
     return (s == null || s.isBlank()) ? null : s;
   }
 
-  /** Advisory inbound hop depth captured from {@code x-trustgate-hop-depth} (0 if absent). */
+  /** Advisory inbound hop depth captured from {@code x-shashu-hop-depth} (0 if absent). */
   public static int inboundHopDepth() {
     Integer n = INBOUND_HOP_DEPTH.get();
     return n != null ? n : 0;
@@ -145,7 +145,7 @@ public final class Tracer {
   }
 
   /**
-   * The captured inbound {@code x-trustgate-caller-agent-id} — the upstream agent that INVOKED this
+   * The captured inbound {@code x-shashu-caller-agent-id} — the upstream agent that INVOKED this
    * hop. The SDK FORWARDS this on the outbound gateway call so the gateway records the real
    * (invoker &rarr; this agent) edge, NEVER this agent's own id (§4.1). To stamp caller = self when
    * this agent INVOKES a downstream agent, use {@link
@@ -160,10 +160,10 @@ public final class Tracer {
   /**
    * Capture an inbound flow from the headers of a request this agent is SERVING, so a downstream
    * call made through the SDK propagates the SAME flow (WP-A2A-4 / ADR-007 §0). Reads
-   * (case-insensitively) {@code x-trustgate-trace-id} (the flow id), {@code
-   * x-trustgate-session-id}, {@code x-trustgate-hop-depth}, and {@code x-trustgate-caller-agent-id}
-   * (the upstream INVOKER). The captured trace is PROPAGATED on the next outbound call (never
-   * re-minted); the inbound caller is FORWARDED on the gateway call (§4.1), never replaced by self.
+   * (case-insensitively) {@code x-shashu-trace-id} (the flow id), {@code x-shashu-session-id},
+   * {@code x-shashu-hop-depth}, and {@code x-shashu-caller-agent-id} (the upstream INVOKER). The
+   * captured trace is PROPAGATED on the next outbound call (never re-minted); the inbound caller is
+   * FORWARDED on the gateway call (§4.1), never replaced by self.
    *
    * <p>One-shot: the capture persists for the rest of the calling thread's work. Servers handling
    * many requests should prefer {@link #incoming(Map)} (a scoped try-with-resources) so one
@@ -199,7 +199,7 @@ public final class Tracer {
    * when no inbound trace is present. Returns true when a trace was captured.
    */
   private static boolean applyCapture(Map<String, String> h) {
-    String trace = trimToNull(h.get("x-trustgate-trace-id"));
+    String trace = trimToNull(h.get("x-shashu-trace-id"));
     if (trace == null) {
       // Origin: clear any ambient capture so non-A2A behavior is unchanged.
       CAPTURED_TRACE_ID.remove();
@@ -209,9 +209,9 @@ public final class Tracer {
       return false;
     }
     CAPTURED_TRACE_ID.set(trace);
-    A2A_SESSION_ID.set(trimToNull(h.get("x-trustgate-session-id")));
-    INBOUND_HOP_DEPTH.set(parseHopDepth(h.get("x-trustgate-hop-depth")));
-    INBOUND_CALLER_AGENT_ID.set(trimToNull(h.get("x-trustgate-caller-agent-id")));
+    A2A_SESSION_ID.set(trimToNull(h.get("x-shashu-session-id")));
+    INBOUND_HOP_DEPTH.set(parseHopDepth(h.get("x-shashu-hop-depth")));
+    INBOUND_CALLER_AGENT_ID.set(trimToNull(h.get("x-shashu-caller-agent-id")));
     return true;
   }
 
@@ -250,7 +250,7 @@ public final class Tracer {
 
   /**
    * Configure the tracer's flush target. Call once at app startup — idempotent. If unset, the
-   * tracer reads {@code TRUSTGATE_API_KEY} + {@code TRUSTGATE_BASE_URL} at flush time.
+   * tracer reads {@code SHASHU_API_KEY} + {@code SHASHU_BASE_URL} at flush time.
    */
   public static void configure(String apiKey, String gatewayBaseUrl) {
     Tracer.credential = apiKey == null ? null : new CredentialResolver(apiKey, null, false);
@@ -374,7 +374,7 @@ public final class Tracer {
               + dropped
               + " buffered span(s) were dropped rather than sent. Call"
               + " Tracer.configure(apiKey, gatewayBaseUrl) or set the"
-              + " SHASHU_BASE_URL or TRUSTGATE_BASE_URL environment variable. SHASHU is"
+              + " SHASHU_BASE_URL environment variable. SHASHU is"
               + " self-hosted: the SDK has no default address and will not"
               + " guess one. (warned once per process)");
     }

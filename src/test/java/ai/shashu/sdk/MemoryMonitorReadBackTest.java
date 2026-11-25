@@ -25,14 +25,14 @@ class MemoryMonitorReadBackTest {
   static Map<String, String> headers() {
     Map<String, String> h = new LinkedHashMap<>();
     h.put("x-request-id", "3e34807577adb89d281f10ad7c73c0d5");
-    h.put("x-trustgate-decision", "not_checked");
+    h.put("x-shashu-decision", "not_checked");
     h.put(
-        "x-trustgate-inspection",
+        "x-shashu-inspection",
         "input=checked;output=skipped;reason=output_scan_disabled;dlp=skipped;"
             + "forensic=skipped;memory=checked;output_scan=skipped;regex=skipped");
     h.put("x-should-retry", "false");
-    h.put("x-trustgate-code", "inspector_timeout");
-    h.put("x-trustgate-memory", "writes=1;blocked=0;recalls=0;flagged=0");
+    h.put("x-shashu-code", "inspector_timeout");
+    h.put("x-shashu-memory", "writes=1;blocked=0;recalls=0;flagged=0");
     return h;
   }
 

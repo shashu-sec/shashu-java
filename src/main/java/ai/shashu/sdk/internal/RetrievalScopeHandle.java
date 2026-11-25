@@ -39,7 +39,7 @@ import java.util.concurrent.Executor;
  */
 public final class RetrievalScopeHandle implements AutoCloseable {
 
-  /** What {@code TRUSTGATE_DISABLE=1} hands back: a scope that does nothing. */
+  /** What {@code SHASHU_DISABLE=1} hands back: a scope that does nothing. */
   static final RetrievalScopeHandle INERT = new RetrievalScopeHandle(null, null);
 
   private final RetrievalBus.Holder opened;
