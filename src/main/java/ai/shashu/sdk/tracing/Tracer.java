@@ -354,7 +354,7 @@ public final class Tracer {
               .build();
       flushHttp.send(req, HttpResponse.BodyHandlers.discarding());
     } catch (IOException | InterruptedException e) {
-      System.err.println("[trustgate.tracer] flush failed: " + e.getMessage());
+      System.err.println("[shashu.tracer] flush failed: " + e.getMessage());
       if (e instanceof InterruptedException) {
         Thread.currentThread().interrupt();
       }

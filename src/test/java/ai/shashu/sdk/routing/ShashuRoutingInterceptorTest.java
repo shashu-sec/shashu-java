@@ -43,7 +43,7 @@ class ShashuRoutingInterceptorTest {
   private OkHttpClient buildClient() {
     return new OkHttpClient.Builder()
         .addInterceptor(
-            new ShashuRoutingInterceptor("sk-trustgate-fake", gateway.url("/").toString(), null))
+            new ShashuRoutingInterceptor("sk-shashu-fake", gateway.url("/").toString(), null))
         .build();
   }
 
@@ -64,7 +64,7 @@ class ShashuRoutingInterceptorTest {
     RecordedRequest seen = gateway.takeRequest();
     // Host is the mock server; path preserved as /v1/chat/completions.
     assertEquals("/v1/chat/completions", seen.getPath());
-    assertEquals("Bearer sk-trustgate-fake", seen.getHeader("Authorization"));
+    assertEquals("Bearer sk-shashu-fake", seen.getHeader("Authorization"));
     // Vendor key dropped:
     assertNotEquals("Bearer sk-real-openai-key", seen.getHeader("Authorization"));
   }
@@ -88,7 +88,7 @@ class ShashuRoutingInterceptorTest {
 
     RecordedRequest seen = gateway.takeRequest();
     assertEquals("/v1/messages", seen.getPath());
-    assertEquals("Bearer sk-trustgate-fake", seen.getHeader("Authorization"));
+    assertEquals("Bearer sk-shashu-fake", seen.getHeader("Authorization"));
     // Vendor-specific auth headers stripped — gateway never forwards them.
     assertNull(seen.getHeader("x-api-key"));
     assertNull(seen.getHeader("anthropic-version"));
@@ -113,7 +113,7 @@ class ShashuRoutingInterceptorTest {
     // Google's vendor path gets mapped to the gateway's OpenAI-compat
     // endpoint; gateway has a Google-shape adapter that reshapes the body.
     assertEquals("/v1/chat/completions", seen.getPath());
-    assertEquals("Bearer sk-trustgate-fake", seen.getHeader("Authorization"));
+    assertEquals("Bearer sk-shashu-fake", seen.getHeader("Authorization"));
     assertNull(seen.getHeader("x-goog-api-key"));
   }
 
@@ -132,7 +132,7 @@ class ShashuRoutingInterceptorTest {
         new OkHttpClient.Builder()
             .addInterceptor(
                 new ShashuRoutingInterceptor(
-                    "sk-trustgate-fake",
+                    "sk-shashu-fake",
                     "https://gateway.test.invalid/", // gateway URL the interceptor would rewrite TO
                     null))
             .build();
@@ -227,7 +227,7 @@ class ShashuRoutingInterceptorTest {
         new OkHttpClient.Builder()
             .addInterceptor(
                 GatewayRouting.asInterceptor(
-                    "sk-trustgate-fake", gateway.url("/").toString(), null, null))
+                    "sk-shashu-fake", gateway.url("/").toString(), null, null))
             .build();
     assertNull(routeOne(http, null).getHeader("shashu-version"));
   }
@@ -236,7 +236,7 @@ class ShashuRoutingInterceptorTest {
   void routed_request_pinned_version_via_facade() throws Exception {
     OkHttpClient http =
         GatewayRouting.newOkHttpClient(
-            "sk-trustgate-fake", gateway.url("/").toString(), null, "2026-10-01");
+            "sk-shashu-fake", gateway.url("/").toString(), null, "2026-10-01");
     assertEquals("2026-10-01", routeOne(http, null).getHeader("shashu-version"));
   }
 

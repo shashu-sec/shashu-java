@@ -19,7 +19,7 @@ public final class ShashuDecision {
   private final RoutePolicy routePolicy;
   private final Map<String, Object> inspection;
 
-  /** Parsed {@code trustgate} decision envelope from a response. */
+  /** Parsed {@code shashu} decision envelope from a response. */
   public ShashuDecision(String decision, String code, Boolean retryable, String id) {
     this(decision, code, retryable, id, null, null, null, null);
   }

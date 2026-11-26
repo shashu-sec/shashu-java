@@ -43,7 +43,7 @@ class ToolCallTest {
 
   private ShashuClient newClient() {
     return ShashuClient.builder()
-        .apiKey("sk-trustgate-test")
+        .apiKey("sk-shashu-test")
         .baseUrl(server.url("/").toString())
         .build();
   }

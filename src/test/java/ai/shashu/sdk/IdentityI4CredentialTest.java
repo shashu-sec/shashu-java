@@ -64,7 +64,7 @@ class IdentityI4CredentialTest {
             () ->
                 ShashuClient.builder()
                     .baseUrl(server.url("/").toString())
-                    .apiKey("tg_sk_x")
+                    .apiKey("shashu_sk_x")
                     .tokenProvider(() -> "p")
                     .build());
     assertEquals(CredentialResolver.BOTH_OR_NEITHER, both.getMessage());
@@ -237,19 +237,19 @@ class IdentityI4CredentialTest {
     enqueueOk();
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("tg_sk_test")
+            .apiKey("shashu_sk_test")
             .baseUrl(server.url("/").toString())
             .maxRetries(0)
             .build()) {
       create(client);
     }
-    assertEquals("Bearer tg_sk_test", server.takeRequest().getHeader("Authorization"));
+    assertEquals("Bearer shashu_sk_test", server.takeRequest().getHeader("Authorization"));
 
     server.enqueue(json(401, refusal(PassCodes.PASS_EXPIRED, EXPIRED_SENTENCE)));
     enqueueOk();
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("tg_sk_test")
+            .apiKey("shashu_sk_test")
             .baseUrl(server.url("/").toString())
             .maxRetries(0)
             .build()) {

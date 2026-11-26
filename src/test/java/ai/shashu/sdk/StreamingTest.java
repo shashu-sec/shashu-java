@@ -51,7 +51,7 @@ class StreamingTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .build()) {
 
@@ -94,7 +94,7 @@ class StreamingTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .build()) {
 
@@ -128,7 +128,7 @@ class StreamingTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .build()) {
 
@@ -167,7 +167,7 @@ class StreamingTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .build()) {
 
@@ -200,7 +200,7 @@ class StreamingTest {
     // use — silently missing SSE chunks would be hard to debug.
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .build()) {
 

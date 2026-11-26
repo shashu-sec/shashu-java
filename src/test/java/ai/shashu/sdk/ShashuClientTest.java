@@ -75,7 +75,7 @@ class ShashuClientTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .build()) {
 
@@ -98,7 +98,7 @@ class ShashuClientTest {
     RecordedRequest req = server.takeRequest();
     assertEquals("POST", req.getMethod());
     assertEquals("/v1/chat/completions", req.getPath());
-    assertEquals("Bearer sk-trustgate-test", req.getHeader("Authorization"));
+    assertEquals("Bearer sk-shashu-test", req.getHeader("Authorization"));
     assertTrue(req.getHeader("User-Agent").startsWith("shashu-java/"));
   }
 
@@ -117,7 +117,7 @@ class ShashuClientTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .maxRetries(2)
             .build()) {
@@ -150,7 +150,7 @@ class ShashuClientTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .maxRetries(1)
             .legacyRetryPolicy(true)
@@ -191,7 +191,7 @@ class ShashuClientTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .maxRetries(2)
             .build()) {
@@ -212,9 +212,9 @@ class ShashuClientTest {
   }
 
   @Test
-  void chatCompletions_connectionError_retried_thenSucceeds() throws Exception {
-    // Force the first connection to drop before responding → IOException;
-    // the SDK should retry and succeed on the second (real) response.
+  void chatCompletions_disconnectAtStart_isNotRetried() throws Exception {
+    // TCP connected; the peer dropped before a response. The request may
+    // already have left, so this is not retried (T2/T3).
     server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
     server.enqueue(
         new MockResponse()
@@ -224,24 +224,52 @@ class ShashuClientTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .maxRetries(2)
             .build()) {
-
-      // Succeeding at all proves the connection error was retried —
-      // without a retry the IOException would have propagated.
-      ChatCompletionResponse resp =
-          client
-              .chat()
-              .completions()
-              .create(
-                  ChatCompletionRequest.builder()
-                      .model("gpt-4o")
-                      .addMessage(ChatMessage.user("hi"))
-                      .build());
-      assertEquals("chatcmpl-fake-1", resp.id());
+      assertThrows(
+          ShashuException.class,
+          () ->
+              client
+                  .chat()
+                  .completions()
+                  .create(
+                      ChatCompletionRequest.builder()
+                          .model("gpt-4o")
+                          .addMessage(ChatMessage.user("hi"))
+                          .build()));
     }
+  }
+
+  @Test
+  void chatCompletions_dropAfterRequest_isNotRetried() throws Exception {
+    server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST));
+    server.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "application/json")
+            .setBody(okBody()));
+
+    try (ShashuClient client =
+        ShashuClient.builder()
+            .apiKey("sk-shashu-test")
+            .baseUrl(server.url("/").toString())
+            .maxRetries(2)
+            .build()) {
+      assertThrows(
+          ShashuException.class,
+          () ->
+              client
+                  .chat()
+                  .completions()
+                  .create(
+                      ChatCompletionRequest.builder()
+                          .model("gpt-4o")
+                          .addMessage(ChatMessage.user("hi"))
+                          .build()));
+    }
+    assertEquals(1, server.getRequestCount());
   }
 
   @Test
@@ -254,7 +282,7 @@ class ShashuClientTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .maxRetries(2)
             .build()) {

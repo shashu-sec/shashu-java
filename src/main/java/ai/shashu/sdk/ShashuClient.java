@@ -34,14 +34,14 @@ import java.util.function.Supplier;
 public final class ShashuClient implements AutoCloseable {
 
   /** Stamped into the User-Agent. Bump in sync with pom.xml &lt;version&gt;. */
-  public static final String SDK_VERSION = "1.1.1";
+  public static final String SDK_VERSION = "1.2.0";
 
   /**
    * The contract version this SDK declares on every request, as the {@code shashu-version} header.
-   * The same value the Python SDK sends ({@code trustgate.context.DEFAULT_CONTRACT_VERSION}).
+   * The same value the Python SDK sends ({@code shashu.context.DEFAULT_CONTRACT_VERSION}).
    *
    * <p>Without it the gateway serves its legacy contract: every refusal arrives as an HTTP 200 with
-   * the sentence in the message content, and the body carries no {@code trustgate} envelope, so the
+   * the sentence in the message content, and the body carries no {@code shashu} envelope, so the
    * memory and inspection details are reduced to header counts. With it a refusal is an error
    * status the SDK raises on, and the full envelope is in the body.
    *

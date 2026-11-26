@@ -637,8 +637,7 @@ class RetrievalHarnessTests {
   /** An OkHttp client wired exactly as a customer's would be, plus the mock gateway. */
   private OkHttpClient client() {
     return new OkHttpClient.Builder()
-        .addInterceptor(
-            new ShashuRoutingInterceptor("sk-trustgate-test", MockGateway.BASE_URL, null))
+        .addInterceptor(new ShashuRoutingInterceptor("sk-shashu-test", MockGateway.BASE_URL, null))
         .addInterceptor(gateway)
         .build();
   }

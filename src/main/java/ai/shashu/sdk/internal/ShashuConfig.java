@@ -21,7 +21,7 @@ import java.util.Set;
  * entry point that patches a third-party client, carries a retrieval declaration, or sends
  * telemetry.
  *
- * <p>Sibling of the Python SDK's {@code trustgate/_config.py}, the Node SDK's {@code src/config.ts}
+ * <p>Sibling of the Python SDK's {@code shashu/_config.py}, the Node SDK's {@code src/config.ts}
  * and the .NET SDK's {@code Configuration/ShashuConfig.cs}. The thrown message is the frozen
  * template in {@code contracts/sdk-surface.v1.md}.
  */

@@ -152,7 +152,7 @@ class IdentityE2ETest {
   void key_mode_still_works() {
     assumeTrue(env("SHASHU_E2E_KEY") != null, "SHASHU_E2E_KEY not set");
     String key = env("SHASHU_E2E_KEY");
-    assertTrue(key.startsWith("tg_sk_"));
+    assertTrue(key.startsWith("shashu_sk_"));
     try (ShashuClient client = base().apiKey(key).build()) {
       client.chat().completions().create(req());
     }

@@ -43,7 +43,7 @@ class Sdk11WireTest {
   }
 
   private ShashuClient.Builder builder() {
-    return ShashuClient.builder().apiKey("tg_sk_test").baseUrl(server.url("/").toString());
+    return ShashuClient.builder().apiKey("shashu_sk_test").baseUrl(server.url("/").toString());
   }
 
   private static ChatCompletionRequest req(RagContext rag) {
@@ -150,15 +150,16 @@ class Sdk11WireTest {
   }
 
   @Test
-  void e_tg_sk_and_token_provider_error_text() {
+  void e_shashu_sk_and_token_provider_error_text() {
     assertEquals(
         "Give either a SHASHU key or a token provider, not both.",
         CredentialResolver.BOTH_OR_NEITHER);
     ShashuConfigException ex =
         assertThrows(
-            ShashuConfigException.class, () -> new CredentialResolver("tg_sk_x", () -> "p", true));
+            ShashuConfigException.class,
+            () -> new CredentialResolver("shashu_sk_x", () -> "p", true));
     assertEquals(CredentialResolver.BOTH_OR_NEITHER, ex.getMessage());
-    assertEquals("tg_sk_x", new CredentialResolver("tg_sk_x", null, true).get());
+    assertEquals("shashu_sk_x", new CredentialResolver("shashu_sk_x", null, true).get());
   }
 
   @Test

@@ -19,8 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verifies the typed {@link RagContext} setter + free-form {@code trustGateMetadata} extras
- * serialise correctly under {@code shashu_metadata.rag_context} in the request body.
+ * Verifies the typed {@link RagContext} setter + free-form {@code shashuMetadata} extras serialise
+ * correctly under {@code shashu_metadata.rag_context} in the request body.
  */
 class RagContextTest {
 
@@ -40,7 +40,7 @@ class RagContextTest {
 
   private ShashuClient newClient() {
     return ShashuClient.builder()
-        .apiKey("sk-trustgate-test")
+        .apiKey("sk-shashu-test")
         .baseUrl(server.url("/").toString())
         .build();
   }
@@ -100,8 +100,8 @@ class RagContextTest {
                   .model("gpt-4o")
                   .addMessage(ChatMessage.user("hi"))
                   .ragContext(RagContext.builder().corpus("c").query("q").build())
-                  .trustGateMetadata("workflow_step", "Final_Summary")
-                  .trustGateMetadata("custom_field", "value")
+                  .shashuMetadata("workflow_step", "Final_Summary")
+                  .shashuMetadata("custom_field", "value")
                   .build());
     }
 
@@ -154,7 +154,7 @@ class RagContextTest {
                   .model("gpt-4o")
                   .addMessage(ChatMessage.user("hi"))
                   .ragContext(RagContext.builder().corpus("should-be-ignored").build())
-                  .trustGateMetadata("rag_context", customRag)
+                  .shashuMetadata("rag_context", customRag)
                   .build());
     }
 

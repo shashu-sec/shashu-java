@@ -334,7 +334,7 @@ class A2APropagationTests {
   void client_invocation_uses_seeded_self_id() {
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl("https://gateway.test.invalid/")
             .agentId("seed-self")
             .build()) {
@@ -355,7 +355,7 @@ class A2APropagationTests {
     // No agentId option and no gateway call yet → self-id unknown.
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl("https://gateway.test.invalid/")
             .build()) {
       assertThrows(IllegalStateException.class, client::buildInvocationHeaders);
@@ -379,7 +379,7 @@ class A2APropagationTests {
 
       try (ShashuClient client =
           ShashuClient.builder()
-              .apiKey("sk-trustgate-test")
+              .apiKey("sk-shashu-test")
               .baseUrl(server.url("/").toString())
               .agentId("explicit-seed")
               .build()) {
@@ -428,7 +428,7 @@ class A2APropagationTests {
 
       try (ShashuClient client =
           ShashuClient.builder()
-              .apiKey("sk-trustgate-test")
+              .apiKey("sk-shashu-test")
               .baseUrl(server.url("/").toString())
               .build()) {
 
@@ -464,7 +464,7 @@ class A2APropagationTests {
 
       try (ShashuClient client =
           ShashuClient.builder()
-              .apiKey("sk-trustgate-test")
+              .apiKey("sk-shashu-test")
               .baseUrl(server.url("/").toString())
               .agentId("seeded")
               .build()) {

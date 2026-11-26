@@ -46,7 +46,7 @@ public final class ChatCompletionRequest {
 
   /** Free-form control-plane metadata; same lane as ragContext. */
   @com.fasterxml.jackson.annotation.JsonIgnore
-  private final Map<String, Object> trustGateMetadataExtras;
+  private final Map<String, Object> shashuMetadataExtras;
 
   private final Map<String, Object> extra;
 
@@ -60,9 +60,9 @@ public final class ChatCompletionRequest {
     this.stop = b.stop != null ? Collections.unmodifiableList(new ArrayList<>(b.stop)) : null;
     this.extra = b.extra != null ? Collections.unmodifiableMap(new HashMap<>(b.extra)) : null;
     this.ragContext = b.ragContext;
-    this.trustGateMetadataExtras =
-        b.trustGateMetadata != null
-            ? Collections.unmodifiableMap(new HashMap<>(b.trustGateMetadata))
+    this.shashuMetadataExtras =
+        b.shashuMetadata != null
+            ? Collections.unmodifiableMap(new HashMap<>(b.shashuMetadata))
             : null;
   }
 
@@ -107,24 +107,23 @@ public final class ChatCompletionRequest {
   }
 
   /** Extra keys merged into {@code x-shashu-metadata}. */
-  public Map<String, Object> trustGateMetadataExtras() {
-    return trustGateMetadataExtras;
+  public Map<String, Object> shashuMetadataExtras() {
+    return shashuMetadataExtras;
   }
 
   /**
    * Computed-at-serialisation merged {@code shashu_metadata} blob. Combines {@link
-   * #trustGateMetadataExtras()} with {@link #ragContext()} so the gateway's ingress-rag scanner has
+   * #shashuMetadataExtras()} with {@link #ragContext()} so the gateway's ingress-rag scanner has
    * structured retrieval data to work with. Returns null when both are absent so the field is
    * omitted from the JSON body (NON_NULL include).
    */
   @JsonProperty("shashu_metadata")
-  public Map<String, Object> trustGateMetadataPayload() {
-    if (ragContext == null
-        && (trustGateMetadataExtras == null || trustGateMetadataExtras.isEmpty())) {
+  public Map<String, Object> shashuMetadataPayload() {
+    if (ragContext == null && (shashuMetadataExtras == null || shashuMetadataExtras.isEmpty())) {
       return null;
     }
     Map<String, Object> merged =
-        trustGateMetadataExtras != null ? new HashMap<>(trustGateMetadataExtras) : new HashMap<>();
+        shashuMetadataExtras != null ? new HashMap<>(shashuMetadataExtras) : new HashMap<>();
     if (ragContext != null) {
       merged.putIfAbsent("rag_context", ragContext);
     }
@@ -156,7 +155,7 @@ public final class ChatCompletionRequest {
     private List<String> stop;
     private Map<String, Object> extra;
     private RagContext ragContext;
-    private Map<String, Object> trustGateMetadata;
+    private Map<String, Object> shashuMetadata;
 
     /** Model id on the request or the routed model on the response. */
     public Builder model(String model) {
@@ -228,9 +227,9 @@ public final class ChatCompletionRequest {
      * control-plane fields the gateway adds after this SDK release without us having to ship typed
      * setters. Composable with {@link #ragContext}.
      */
-    public Builder trustGateMetadata(String key, Object value) {
-      if (this.trustGateMetadata == null) this.trustGateMetadata = new HashMap<>();
-      this.trustGateMetadata.put(key, value);
+    public Builder shashuMetadata(String key, Object value) {
+      if (this.shashuMetadata == null) this.shashuMetadata = new HashMap<>();
+      this.shashuMetadata.put(key, value);
       return this;
     }
 

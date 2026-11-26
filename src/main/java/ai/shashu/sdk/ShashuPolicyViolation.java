@@ -19,11 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *   <li><b>A provider permission failure, passed through</b> — the gateway's stored provider
  *       credential is valid but has no access to the target model. Nothing about the customer's
  *       Shashu policy is wrong. These carry {@code error.type} = {@code "ProviderPermissionError"}
- *       and a message prefixed {@code "TrustGate Provider Error: "}.
+ *       and a message prefixed {@code "SHASHU Provider Error: "}.
  *   <li><b>An Anthropic-shaped envelope</b> — on {@code /v1/messages}, when the deployment sets
- *       {@code TRUSTGATE_WIRE_SHAPE_MESSAGES=enforce}, the gateway rewrites access-decision 403s
- *       into Anthropic's error shape and {@link #errorType()} reads {@code "permission_error"}
- *       instead.
+ *       when the messages wire-shape flag is on, the gateway rewrites access-decision 403s into
+ *       Anthropic's error shape and {@link #errorType()} reads {@code "permission_error"} instead.
  * </ol>
  *
  * <h2>A security block is NOT a 403</h2>
@@ -98,9 +97,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * {@code "invalid_request_error"} for every 4xx the gateway raises itself — a 401, a 403 and a 422
  * are indistinguishable by it; under the contract it restates the status ({@code permission_error}
  * on a 403). Do not branch on {@link #errorType()}; branch on {@link #statusCode()} and, if you
- * must, on the message text. Sub-typing budget-vs-policy is tracked as {@code
- * TRUSTGATE-403-DISCRIMINATOR} and is not available today — <a
- * href="https://github.com/aisquad001/trustgate-ai/issues/736">trustgate-ai#736</a>.
+ * must, on the message text. Sub-typing budget-vs-policy is tracked as the 403 discriminator ticket
+ * and is not available today.
  */
 public class ShashuPolicyViolation extends ShashuException {
 

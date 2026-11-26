@@ -39,7 +39,7 @@ class AuditTest {
 
   private ShashuClient newClient() {
     return ShashuClient.builder()
-        .apiKey("sk-trustgate-test")
+        .apiKey("sk-shashu-test")
         .baseUrl(server.url("/").toString())
         .maxRetries(0)
         .build();

@@ -2,6 +2,21 @@
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — 2026-11-26
+
+BREAKING: framework state keys are now `shashu_session_id` / `shashu_trace_id`.
+The previous names are not read.
+
+Provider pass-through errors are recognised by `SHASHU Provider Error:` (needs a
+gateway that sends it). There is no fallback to the previous prefix.
+
+SHASHU keys start `shashu_sk_`. Metadata, docs, and package URLs no longer
+carry the previous product name. Java request extras use `shashuMetadata` /
+`shashuHeaders` (the previous method names are gone).
+
+Fixed: after a request has been sent, a dropped connection is
+no longer retried automatically (avoids running the same request twice).
+
 ## [1.1.1] — 2026-11-25
 
 Fixed: when the gateway was busy and the SDK retried, the retry could be sent
@@ -24,8 +39,8 @@ The one-shot `pass_expired` retry is unchanged and does not stack with busy-retr
 
 ### Breaking
 
-- Environment variables are `SHASHU_API_KEY` / `SHASHU_BASE_URL` / `SHASHU_DISABLE` only. The `TRUSTGATE_*` fallbacks are removed.
-- Wire names are SHASHU only. Old TrustGate names are neither sent nor read.
+- Environment variables are `SHASHU_API_KEY` / `SHASHU_BASE_URL` / `SHASHU_DISABLE` only. The old environment-variable names are no longer read.
+- Wire names are SHASHU only. Old wire names are neither sent nor read.
 
 ## [1.0.0] — 2026-11-13
 

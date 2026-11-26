@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * OpenAI-compatible chat-completions response. The Shashu-specific security verdict / audit
  * metadata is attached as {@code x-shashu-*} response headers, not in the JSON body — same as the
- * .NET / Python / Node SDKs. A top-level {@code trustgate} envelope, when present, is retained in
+ * .NET / Python / Node SDKs. A top-level {@code shashu} envelope, when present, is retained in
  * {@link #extraFields()} so {@code Shashu.decisionOf} can read the body carrier.
  */
 public final class ChatCompletionResponse {
@@ -25,7 +25,7 @@ public final class ChatCompletionResponse {
   private final List<Choice> choices;
   private final Usage usage;
   private final Map<String, JsonNode> extraFields = new LinkedHashMap<>();
-  @JsonIgnore private Map<String, String> trustGateHeaders = Map.of();
+  @JsonIgnore private Map<String, String> shashuHeaders = Map.of();
 
   @JsonCreator
   /** Parsed non-streaming chat completion body. */
@@ -79,7 +79,7 @@ public final class ChatCompletionResponse {
   }
 
   /**
-   * Unknown JSON members, including the top-level {@code trustgate} decision envelope. Without this
+   * Unknown JSON members, including the top-level {@code shashu} decision envelope. Without this
    * slot the envelope is dropped on parse and {@code Shashu.decisionOf} cannot read the body
    * carrier.
    */
@@ -96,13 +96,13 @@ public final class ChatCompletionResponse {
    * {@code x-shashu-*} (and sibling) response headers captured from the HTTP response. Empty when
    * the object was not built by this SDK.
    */
-  public Map<String, String> trustGateHeaders() {
-    return trustGateHeaders;
+  public Map<String, String> shashuHeaders() {
+    return shashuHeaders;
   }
 
   /** Copy SHASHU response headers onto this completion for inspection. */
   public void attachShashuHeaders(Map<String, String> headers) {
-    this.trustGateHeaders = (headers == null || headers.isEmpty()) ? Map.of() : Map.copyOf(headers);
+    this.shashuHeaders = (headers == null || headers.isEmpty()) ? Map.of() : Map.copyOf(headers);
   }
 
   /** Single choice (completion). */

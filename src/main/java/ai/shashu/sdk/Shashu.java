@@ -72,7 +72,7 @@ public final class Shashu {
       return already;
     }
     if (resultOrError instanceof ChatCompletionResponse chat) {
-      return decisionFrom(chat, chat.trustGateHeaders());
+      return decisionFrom(chat, chat.shashuHeaders());
     }
     if (resultOrError instanceof ShashuException ex) {
       return decisionFrom(ex.responseBody(), ex.responseHeaders());

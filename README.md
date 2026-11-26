@@ -1,11 +1,11 @@
 # SHASHU Java SDK
 
-Java client for **SHASHU by Trustgate AI**, a self-hosted AI security gateway.
+Java client for **SHASHU**, a self-hosted AI security gateway.
 Point it at your own gateway. There is no default hostname: construction
 raises a configuration error rather than guessing.
 
 Wire names (`x-shashu-*`, `shashu_metadata`, `shashu-version`,
-`tg_sk_`) are protocol names on the SHASHU wire and are unchanged.
+`shashu_sk_`) are protocol names on the SHASHU wire and are unchanged.
 
 After this first mention, this document says **SHASHU**.
 
@@ -32,7 +32,7 @@ Key:
 ```java
 try (ShashuClient client = ShashuClient.builder()
         .baseUrl("https://your-shashu-gateway.example")
-        .apiKey("tg_sk_...")
+        .apiKey("shashu_sk_...")
         .build()) {
     var response = client.chat().completions().create(
         ChatCompletionRequest.builder()

@@ -61,7 +61,7 @@ class RetrievalConfigTests {
     ShashuConfigException thrown =
         assertThrows(
             ShashuConfigException.class,
-            () -> ShashuClient.builder().apiKey("sk-trustgate-test").build());
+            () -> ShashuClient.builder().apiKey("sk-shashu-test").build());
 
     assertEquals(frozen("ShashuClient.builder().build()", ".baseUrl(...)"), thrown.getMessage());
     assertNamesTheVariableAndNoHost(thrown.getMessage());
@@ -74,7 +74,7 @@ class RetrievalConfigTests {
 
     ShashuConfigException thrown =
         assertThrows(
-            ShashuConfigException.class, () -> new ShashuRoutingInterceptor("sk-trustgate-test"));
+            ShashuConfigException.class, () -> new ShashuRoutingInterceptor("sk-shashu-test"));
 
     assertEquals(
         frozen("new ShashuRoutingInterceptor(...)", "gatewayBaseUrlOverride"), thrown.getMessage());
@@ -85,7 +85,7 @@ class RetrievalConfigTests {
   @DisplayName("ShashuConfigException is a ShashuException, so existing catches still work")
   void the_config_exception_is_catchable_as_the_parent() {
     RetrievalTestAccess.setEnv(Map.of());
-    assertThrows(ShashuException.class, () -> new ShashuRoutingInterceptor("sk-trustgate-test"));
+    assertThrows(ShashuException.class, () -> new ShashuRoutingInterceptor("sk-shashu-test"));
   }
 
   @Test
@@ -95,10 +95,10 @@ class RetrievalConfigTests {
 
     // Constructing without throwing IS the assertion: the interceptor
     // resolves its address in the constructor.
-    ShashuRoutingInterceptor interceptor = new ShashuRoutingInterceptor("sk-trustgate-test");
+    ShashuRoutingInterceptor interceptor = new ShashuRoutingInterceptor("sk-shashu-test");
     assertFalse(interceptor.toString().isEmpty());
 
-    try (ShashuClient client = ShashuClient.builder().apiKey("sk-trustgate-test").build()) {
+    try (ShashuClient client = ShashuClient.builder().apiKey("sk-shashu-test").build()) {
       assertTrue(client.agentId() == null || !client.agentId().isEmpty());
     }
   }
@@ -108,7 +108,7 @@ class RetrievalConfigTests {
   void the_explicit_option_wins() {
     RetrievalTestAccess.setEnv(Map.of("SHASHU_BASE_URL", "https://from-env.example/"));
     // No throw, and no reliance on the env value: the explicit one is used.
-    new ShashuRoutingInterceptor("sk-trustgate-test", "https://explicit.test.invalid/", null);
+    new ShashuRoutingInterceptor("sk-shashu-test", "https://explicit.test.invalid/", null);
   }
 
   @Test
@@ -117,7 +117,7 @@ class RetrievalConfigTests {
     RetrievalTestAccess.setEnv(Map.of());
 
     try (LogCapture logs = new LogCapture()) {
-      Tracer.configure("sk-trustgate-test", null);
+      Tracer.configure("sk-shashu-test", null);
       try (Tracer.SpanHandle span = Tracer.span("retrieval")) {
         assertTrue(Tracer.isActive());
       }

@@ -40,7 +40,7 @@ class RetryPartCTest {
   }
 
   private ShashuClient.Builder builder() {
-    return ShashuClient.builder().apiKey("tg_sk_same").baseUrl(server.url("/").toString());
+    return ShashuClient.builder().apiKey("shashu_sk_same").baseUrl(server.url("/").toString());
   }
 
   private static ChatCompletionRequest req() {

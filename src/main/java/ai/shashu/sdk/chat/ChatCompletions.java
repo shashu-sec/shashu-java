@@ -115,9 +115,9 @@ public final class ChatCompletions {
     if (request.ragContext() != null) {
       b.ragContext(request.ragContext());
     }
-    if (request.trustGateMetadataExtras() != null) {
-      for (var e : request.trustGateMetadataExtras().entrySet()) {
-        b.trustGateMetadata(e.getKey(), e.getValue());
+    if (request.shashuMetadataExtras() != null) {
+      for (var e : request.shashuMetadataExtras().entrySet()) {
+        b.shashuMetadata(e.getKey(), e.getValue());
       }
     }
     return api.postStream("/v1/chat/completions", b.build(), sessionId);

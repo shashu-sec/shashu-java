@@ -89,7 +89,7 @@ class CompatibleBlockTest {
     enqueue(BLOCKED_200);
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .contractVersion(null)
             .build()) {
@@ -132,7 +132,7 @@ class CompatibleBlockTest {
 
   private ShashuClient client() {
     return ShashuClient.builder()
-        .apiKey("sk-trustgate-test")
+        .apiKey("sk-shashu-test")
         .baseUrl(server.url("/").toString())
         .build();
   }

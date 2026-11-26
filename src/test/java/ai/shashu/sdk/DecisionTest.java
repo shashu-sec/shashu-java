@@ -151,7 +151,7 @@ class DecisionTest {
                       + "\"shashu\":{\"decision\":\"allow_altered\",\"code\":\"dlp\"}}"));
       try (ShashuClient client =
           ShashuClient.builder()
-              .apiKey("sk-trustgate-test")
+              .apiKey("sk-shashu-test")
               .baseUrl(server.url("/").toString())
               .build()) {
         ChatCompletionResponse resp =
@@ -188,7 +188,7 @@ class DecisionTest {
                       + "\"finish_reason\":\"stop\"}]}"));
       try (ShashuClient client =
           ShashuClient.builder()
-              .apiKey("sk-trustgate-test")
+              .apiKey("sk-shashu-test")
               .baseUrl(server.url("/").toString())
               .build()) {
         ChatCompletionResponse resp =

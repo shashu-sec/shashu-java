@@ -111,7 +111,7 @@ class SessionOriginTests {
   }
 
   private ShashuClient client(String sessionId) {
-    var b = ShashuClient.builder().apiKey("sk-trustgate-test").baseUrl(server.url("/").toString());
+    var b = ShashuClient.builder().apiKey("sk-shashu-test").baseUrl(server.url("/").toString());
     if (sessionId != null) {
       b.sessionId(sessionId);
     }

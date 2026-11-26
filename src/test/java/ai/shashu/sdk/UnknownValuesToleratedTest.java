@@ -115,7 +115,7 @@ class UnknownValuesToleratedTest {
 
   static ShashuClient client(MockWebServer server) {
     return ShashuClient.builder()
-        .apiKey("sk-trustgate-test")
+        .apiKey("sk-shashu-test")
         .baseUrl(server.url("/").toString())
         .build();
   }

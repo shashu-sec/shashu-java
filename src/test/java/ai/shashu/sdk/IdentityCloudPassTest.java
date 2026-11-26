@@ -88,7 +88,7 @@ class IdentityCloudPassTest {
             () ->
                 ShashuClient.builder()
                     .baseUrl("http://127.0.0.1:9")
-                    .apiKey("tg_sk_x")
+                    .apiKey("shashu_sk_x")
                     .tokenProvider(() -> "p")
                     .build());
     assertEquals(CredentialResolver.BOTH_OR_NEITHER, both.getMessage());
@@ -183,7 +183,7 @@ class IdentityCloudPassTest {
     try (ShashuClient tg =
         ShashuClient.builder()
             .baseUrl(server.url("/").toString())
-            .apiKey("tg_sk_test")
+            .apiKey("shashu_sk_test")
             .maxRetries(0)
             .build()) {
       ShashuAuthenticationException ex =
@@ -290,12 +290,12 @@ class IdentityCloudPassTest {
     try (ShashuClient tg =
         ShashuClient.builder()
             .baseUrl(server.url("/").toString())
-            .apiKey("tg_sk_test")
+            .apiKey("shashu_sk_test")
             .maxRetries(0)
             .build()) {
       chat(tg);
     }
-    assertEquals("Bearer tg_sk_test", server.takeRequest().getHeader("Authorization"));
+    assertEquals("Bearer shashu_sk_test", server.takeRequest().getHeader("Authorization"));
   }
 
   private static MockResponse json(String body) {

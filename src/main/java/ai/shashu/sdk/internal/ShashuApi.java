@@ -15,6 +15,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -88,6 +92,7 @@ public final class ShashuApi {
     this.http =
         withCredential(
             new OkHttpClient.Builder()
+                .retryOnConnectionFailure(false)
                 .callTimeout(options.timeoutMillis(), TimeUnit.MILLISECONDS)
                 .build());
   }
@@ -283,10 +288,10 @@ public final class ShashuApi {
         delayMillis =
             withJitter(retryAfterMillis != null ? retryAfterMillis : backoffMillis(attempt));
       } catch (IOException e) {
-        // Connection-level failure — the request never received a
-        // response, so a retry can't duplicate a side effect. Always
-        // retried (independent of the 5xx policy) until exhausted.
-        if (attempt >= options.maxRetries()) {
+        // Retry only if the request never left (connect refused / DNS /
+        // connect timeout). A drop after the bytes were sent is raised:
+        // the gateway may already have run the call.
+        if (!requestNeverLeft(e) || attempt >= options.maxRetries()) {
           throw new ShashuException("HTTP call failed", e);
         }
         delayMillis = backoffMillis(attempt);
@@ -300,6 +305,25 @@ public final class ShashuApi {
       }
       attempt++;
     }
+  }
+
+  static boolean requestNeverLeft(IOException e) {
+    for (Throwable t = e; t != null; t = t.getCause()) {
+      if (t instanceof ConnectException
+          || t instanceof UnknownHostException
+          || t instanceof NoRouteToHostException) {
+        return true;
+      }
+      if (t instanceof SocketTimeoutException) {
+        String m = t.getMessage() == null ? "" : t.getMessage().toLowerCase();
+        return m.contains("connect");
+      }
+      String m = t.getMessage() == null ? "" : t.getMessage();
+      if (m.contains("Failed to connect")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Exponential backoff with jitter: 250ms, 500ms, 1s, capped at 2s. */
@@ -434,8 +458,7 @@ public final class ShashuApi {
   /**
    * Apply per-request workflow-context headers (Shadow AI source, trace id, runtime metadata,
    * source-tool blob) to a request just before it goes on the wire. Mirrors the .NET SDK's {@code
-   * ShashuApi.ApplyWorkflowContext} and the Python SDK's {@code build_trustgate_headers()}
-   * contract.
+   * ShashuApi.ApplyWorkflowContext} and the Python SDK's {@code build_shashu_headers()} contract.
    */
   /**
    * Declare the contract version ({@link ShashuClientOptions#contractVersion()}). Absent when the

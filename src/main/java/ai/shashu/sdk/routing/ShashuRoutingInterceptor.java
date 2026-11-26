@@ -39,7 +39,7 @@ import okhttp3.Response;
  *
  * <pre>{@code
  * OkHttpClient http = new OkHttpClient.Builder()
- *     .addInterceptor(new ShashuRoutingInterceptor("sk-trustgate-..."))
+ *     .addInterceptor(new ShashuRoutingInterceptor("sk-shashu-..."))
  *     .build();
  *
  * // Any vendor SDK that lets you inject OkHttpClient now routes through Shashu.
@@ -276,11 +276,11 @@ public class ShashuRoutingInterceptor implements Interceptor {
     // 3. User-Agent annotation. Don't replace — append. Vendor SDK's UA
     //    is preserved for upstream telemetry attribution.
     String existingUa = original.header("User-Agent");
-    String trustgateUa = "shashu-java/" + ShashuClient.SDK_VERSION;
+    String shashuUa = "shashu-java/" + ShashuClient.SDK_VERSION;
     if (existingUa == null || existingUa.isBlank()) {
-      reqBuilder.header("User-Agent", trustgateUa);
+      reqBuilder.header("User-Agent", shashuUa);
     } else if (!existingUa.contains("shashu-java/")) {
-      reqBuilder.header("User-Agent", existingUa + " " + trustgateUa);
+      reqBuilder.header("User-Agent", existingUa + " " + shashuUa);
     }
 
     // 4. Optional org scoping.

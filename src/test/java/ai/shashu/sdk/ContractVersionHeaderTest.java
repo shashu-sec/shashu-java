@@ -283,7 +283,7 @@ class ContractVersionHeaderTest {
   }
 
   private ShashuClient.Builder builder() {
-    return ShashuClient.builder().apiKey("sk-trustgate-test").baseUrl(server.url("/").toString());
+    return ShashuClient.builder().apiKey("sk-shashu-test").baseUrl(server.url("/").toString());
   }
 
   private ShashuClient client() {

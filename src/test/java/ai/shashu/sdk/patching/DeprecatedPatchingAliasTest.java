@@ -41,7 +41,7 @@ class DeprecatedPatchingAliasTest {
     gateway.enqueue(new MockResponse().setResponseCode(200).setBody("{}"));
 
     OkHttpClient http =
-        ProviderPatch.newOkHttpClient("sk-trustgate-fake", gateway.url("/").toString(), null);
+        ProviderPatch.newOkHttpClient("sk-shashu-fake", gateway.url("/").toString(), null);
 
     Request req =
         new Request.Builder()
@@ -53,13 +53,13 @@ class DeprecatedPatchingAliasTest {
 
     RecordedRequest seen = gateway.takeRequest();
     assertEquals("/v1/chat/completions", seen.getPath());
-    assertEquals("Bearer sk-trustgate-fake", seen.getHeader("Authorization"));
+    assertEquals("Bearer sk-shashu-fake", seen.getHeader("Authorization"));
   }
 
   @Test
   void deprecated_interceptor_is_the_routing_interceptor_not_a_look_alike() {
     ShashuRoutingInterceptor legacy =
-        new ShashuRoutingInterceptor("sk-trustgate-fake", gateway.url("/").toString(), null);
+        new ShashuRoutingInterceptor("sk-shashu-fake", gateway.url("/").toString(), null);
     assertInstanceOf(ai.shashu.sdk.routing.ShashuRoutingInterceptor.class, legacy);
   }
 }

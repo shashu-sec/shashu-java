@@ -75,7 +75,7 @@ class WorkflowContextTest {
     String blob = headers.get("x-shashu-source-tool");
     assertNotNull(blob, "source-tool header must always be emitted");
     JsonNode root = mapper.readTree(blob);
-    assertEquals("trustgate-java", root.path("sdk").asText());
+    assertEquals("shashu-java", root.path("sdk").asText());
     assertEquals("java", root.path("language").asText());
     assertFalse(root.path("timestamp_utc").asText().isEmpty(), "timestamp_utc must be present");
   }
@@ -88,7 +88,7 @@ class WorkflowContextTest {
     assertEquals("extract", root.path("step_name").asText());
     assertEquals("req-42", root.path("request_id").asText());
     // Default fields preserved:
-    assertEquals("trustgate-java", root.path("sdk").asText());
+    assertEquals("shashu-java", root.path("sdk").asText());
   }
 
   @Test
@@ -116,7 +116,7 @@ class WorkflowContextTest {
 
     try (ShashuClient client =
         ShashuClient.builder()
-            .apiKey("sk-trustgate-test")
+            .apiKey("sk-shashu-test")
             .baseUrl(server.url("/").toString())
             .build()) {
       client
@@ -140,6 +140,6 @@ class WorkflowContextTest {
 
     // Source-tool is JSON identifying the calling SDK.
     JsonNode sourceTool = mapper.readTree(req.getHeader("x-shashu-source-tool"));
-    assertEquals("trustgate-java", sourceTool.path("sdk").asText());
+    assertEquals("shashu-java", sourceTool.path("sdk").asText());
   }
 }

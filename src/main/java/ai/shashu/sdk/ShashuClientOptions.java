@@ -103,7 +103,7 @@ public final class ShashuClientOptions {
     return credential;
   }
 
-  /** SHASHU key ({@code tg_sk_…}) when not using a token provider. */
+  /** SHASHU key ({@code shashu_sk_…}) when not using a token provider. */
   public String apiKey() {
     return apiKey;
   }

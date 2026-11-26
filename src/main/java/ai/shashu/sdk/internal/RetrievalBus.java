@@ -89,8 +89,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * characters ({@code rag_context.v1}'s {@code maxLength}) rather than the 600 the gateway truncates
  * at today.
  *
- * <p>Sibling of the Python SDK's {@code trustgate/_bus.py}, the Node SDK's {@code src/_bus.ts} and
- * the .NET SDK's {@code Internal/RetrievalBus.cs}.
+ * <p>Sibling of the Python SDK's {@code shashu/_bus.py}, the Node SDK's {@code src/_bus.ts} and the
+ * .NET SDK's {@code Internal/RetrievalBus.cs}.
  */
 public final class RetrievalBus {
 

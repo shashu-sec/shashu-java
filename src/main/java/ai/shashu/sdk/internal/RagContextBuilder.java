@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
  * declarations into the one block the joiner attaches. Visible across the {@code ai.shashu.sdk}
  * packages but not part of the public API.
  *
- * <p>Sibling of the Python SDK's {@code trustgate/rag.py}, the Node SDK's {@code src/rag.ts} and
- * the .NET SDK's {@code Internal/RagContextBuilder.cs}. The reading rules are a DATA table ({@link
+ * <p>Sibling of the Python SDK's {@code shashu/rag.py}, the Node SDK's {@code src/rag.ts} and the
+ * .NET SDK's {@code Internal/RagContextBuilder.cs}. The reading rules are a DATA table ({@link
  * #FIELD_KEYS}) rather than a chain of branches, so a document type that spells its fields the
  * usual way needs no new code at all &mdash; and {@code RagCoercionTests} holds a case for every
  * row.

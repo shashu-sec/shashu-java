@@ -6,11 +6,11 @@
 
     <groupId>ai.shashu</groupId>
     <artifactId>shashu-sdk</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>SHASHU Java SDK</name>
-    <description>Java client for SHASHU by Trustgate AI, a self-hosted AI security gateway. Point it at your own gateway; there is no default endpoint. Declares retrieval, carries session and trace, surfaces the gateway's decision, and recognises a block.</description>
+    <description>Java client for SHASHU, a self-hosted AI security gateway. Point it at your own gateway; there is no default endpoint. Declares retrieval, carries session and trace, surfaces the gateway's decision, and recognises a block.</description>
     <url>https://shashu.ai</url>
 
     <licenses>
@@ -22,25 +22,25 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/trustgateai-io/shashu-java.git</connection>
-        <developerConnection>scm:git:https://github.com/trustgateai-io/shashu-java.git</developerConnection>
-        <url>https://github.com/trustgateai-io/shashu-java</url>
+        <connection>scm:git:https://github.com/shashu-sec/shashu-java.git</connection>
+        <developerConnection>scm:git:https://github.com/shashu-sec/shashu-java.git</developerConnection>
+        <url>https://github.com/shashu-sec/shashu-java</url>
         <tag>HEAD</tag>
     </scm>
 
     <organization>
-        <name>Trustgate AI</name>
-        <url>https://www.trustgateai.io</url>
+        <name>Trustgate AI LLC</name>
+        <url>https://shashu.ai</url>
     </organization>
 
     <!-- Required by Maven Central: at least one developer with name + contact. -->
     <developers>
         <developer>
-            <id>trustgateai</id>
-            <name>Trustgate AI</name>
-            <email>sathis@trustgateai.io</email>
-            <organization>Trustgate AI</organization>
-            <organizationUrl>https://www.trustgateai.io</organizationUrl>
+            <id>shashu</id>
+            <name>Trustgate AI LLC</name>
+            <email>sathis@shashu.ai</email>
+            <organization>Trustgate AI LLC</organization>
+            <organizationUrl>https://shashu.ai</organizationUrl>
         </developer>
     </developers>
 

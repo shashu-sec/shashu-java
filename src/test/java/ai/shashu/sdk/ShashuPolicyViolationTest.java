@@ -60,7 +60,7 @@ class ShashuPolicyViolationTest {
 
   private ShashuClient newClient() {
     return ShashuClient.builder()
-        .apiKey("sk-trustgate-test")
+        .apiKey("sk-shashu-test")
         .baseUrl(server.url("/").toString())
         .maxRetries(0)
         .build();
@@ -162,12 +162,12 @@ class ShashuPolicyViolationTest {
   void provider_5xx_throws_generic_ShashuException_not_PolicyViolation() {
     // Captured shape of an upstream failure: the gateway wraps the provider
     // error in the OpenAI envelope and puts the provider-error class name
-    // in `type`, with the message prefixed "TrustGate Provider Error:".
+    // in `type`, with the message prefixed "SHASHU Provider Error:".
     server.enqueue(
         new MockResponse()
             .setResponseCode(502)
             .setBody(
-                "{\"error\":{\"message\":\"TrustGate Provider Error: upstream provider down\","
+                "{\"error\":{\"message\":\"SHASHU Provider Error: upstream provider down\","
                     + "\"type\":\"ProviderServerError\",\"param\":null,\"code\":\"502\"},\"choices\":[]}"));
 
     try (ShashuClient client = newClient()) {
@@ -194,8 +194,8 @@ class ShashuPolicyViolationTest {
 
   @Test
   @Disabled(
-      "Asserts an UNIMPLEMENTED contract: TRUSTGATE-403-DISCRIMINATOR "
-          + "(https://github.com/aisquad001/trustgate-ai/issues/736). "
+      "Asserts an UNIMPLEMENTED contract: the 403 discriminator ticket "
+          + "(the gateway issue tracker). "
           + "The gateway has never emitted error.type=\"policy_violation\" — every 4xx it raises "
           + "itself carries \"invalid_request_error\" (proxy/helpers.py::_openai_error_response and "
           + "main.py::http_exception_handler). This test passed only because MockWebServer served "

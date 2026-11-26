@@ -40,8 +40,8 @@ import okio.Buffer;
  *       logs rather than left to look like a request nobody declared anything for.
  * </ol>
  *
- * <p>Sibling of the Python SDK's {@code trustgate/_joiner.py}, the Node SDK's {@code
- * src/_joiner.ts} and the .NET SDK's {@code Internal/RetrievalJoiner.cs}.
+ * <p>Sibling of the Python SDK's {@code shashu/_joiner.py}, the Node SDK's {@code src/_joiner.ts}
+ * and the .NET SDK's {@code Internal/RetrievalJoiner.cs}.
  */
 public final class RetrievalJoiner {
 
@@ -93,7 +93,7 @@ public final class RetrievalJoiner {
       // built it. Nothing about the document text is logged.
       LOG.log(
           Level.WARNING,
-          "[trustgate.retrieval] declaration not attached: " + e.getClass().getSimpleName());
+          "[shashu.retrieval] declaration not attached: " + e.getClass().getSimpleName());
       return request;
     }
   }

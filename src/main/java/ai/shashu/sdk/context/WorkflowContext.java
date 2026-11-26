@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * Builds the {@code x-shashu-*} + {@code x-trustlog-*} headers that give the gateway Shadow AI
  * attribution and runtime context for every request. Symmetric with the .NET SDK's {@code
- * WorkflowContext} class and the Python SDK's {@code build_trustgate_headers()}.
+ * WorkflowContext} class and the Python SDK's {@code build_shashu_headers()}.
  *
  * <p>What gets emitted:
  *
@@ -117,7 +117,7 @@ public final class WorkflowContext {
     // Source-tool metadata: SDK identification + system info. Same
     // contract as the .NET SDK's WorkflowContext.
     Map<String, Object> metadata = new LinkedHashMap<>();
-    metadata.put("sdk", "trustgate-java");
+    metadata.put("sdk", "shashu-java");
     metadata.put("sdk_version", ShashuClient.SDK_VERSION);
     metadata.put("language", "java");
     metadata.put("language_version", System.getProperty("java.version"));

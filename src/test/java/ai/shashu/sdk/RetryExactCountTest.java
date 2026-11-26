@@ -32,7 +32,7 @@ class RetryExactCountTest {
   }
 
   private ShashuClient.Builder builder() {
-    return ShashuClient.builder().apiKey("tg_sk_count").baseUrl(server.url("/").toString());
+    return ShashuClient.builder().apiKey("shashu_sk_count").baseUrl(server.url("/").toString());
   }
 
   private static ChatCompletionRequest req() {

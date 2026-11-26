@@ -115,8 +115,7 @@ class MemoryHarnessTests {
 
   private OkHttpClient client() {
     return new OkHttpClient.Builder()
-        .addInterceptor(
-            new ShashuRoutingInterceptor("sk-trustgate-test", MockGateway.BASE_URL, null))
+        .addInterceptor(new ShashuRoutingInterceptor("sk-shashu-test", MockGateway.BASE_URL, null))
         .addInterceptor(gateway)
         .build();
   }

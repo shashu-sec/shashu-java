@@ -488,7 +488,7 @@ class FileMemoryRouteTest {
       server.enqueue(r);
       try (ShashuClient client =
           ShashuClient.builder()
-              .apiKey("sk-trustgate-test")
+              .apiKey("sk-shashu-test")
               .baseUrl(server.url("/").toString())
               .build()) {
         return call.run(client);

@@ -20,7 +20,7 @@ import okhttp3.OkHttpClient;
  * <pre>{@code
  * import ai.shashu.sdk.routing.GatewayRouting;
  *
- * OkHttpClient http = GatewayRouting.newOkHttpClient("sk-trustgate-...");
+ * OkHttpClient http = GatewayRouting.newOkHttpClient("sk-shashu-...");
  *
  * // Pass to whatever vendor SDK lets you supply OkHttpClient:
  * OpenAiService openai = new OpenAiService("placeholder", Duration.ofSeconds(60), http);
@@ -31,7 +31,7 @@ import okhttp3.OkHttpClient;
  *
  * <pre>{@code
  * OkHttpClient http = new OkHttpClient.Builder()
- *     .addInterceptor(GatewayRouting.asInterceptor("sk-trustgate-..."))
+ *     .addInterceptor(GatewayRouting.asInterceptor("sk-shashu-..."))
  *     .addInterceptor(yourLoggingInterceptor)
  *     .connectTimeout(Duration.ofSeconds(30))
  *     .build();
@@ -146,6 +146,7 @@ public final class GatewayRouting {
   public static OkHttpClient newOkHttpClient(
       String apiKey, String gatewayBaseUrl, String organizationId, String contractVersion) {
     return new OkHttpClient.Builder()
+        .retryOnConnectionFailure(false)
         .addInterceptor(asInterceptor(apiKey, gatewayBaseUrl, organizationId, contractVersion))
         .build();
   }

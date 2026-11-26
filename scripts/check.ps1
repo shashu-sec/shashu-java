@@ -13,10 +13,13 @@ function Find-Mvn {
 function Find-Gitleaks {
     $cmd = Get-Command gitleaks -ErrorAction SilentlyContinue
     if ($cmd) { return $cmd.Source }
-    $hint = "$env:TEMP\gitleaks\gitleaks.exe"
-    if (Test-Path $hint) { return $hint }
-    $alt = "C:\Users\sathi\AppData\Local\Temp\gitleaks\gitleaks.exe"
-    if (Test-Path $alt) { return $alt }
+    foreach ($hint in @(
+        "$env:TEMP\gitleaks\gitleaks.exe",
+        "C:\Users\sathi\AppData\Local\Temp\gitleaks\gitleaks.exe",
+        "D:\Trustgate\_agent\det-hardening-data\streamBCD\tools\gitleaks\bin\gitleaks.exe"
+    )) {
+        if (Test-Path $hint) { return $hint }
+    }
     throw "gitleaks not found"
 }
 function Ensure-Osv {
@@ -72,9 +75,9 @@ foreach ($j in $homes) {
 }
 
 Write-Host "== jar contents =="
-$jar = Join-Path $Root "target\shashu-sdk-1.1.1.jar"
-$src = Join-Path $Root "target\shashu-sdk-1.1.1-sources.jar"
-$jdoc = Join-Path $Root "target\shashu-sdk-1.1.1-javadoc.jar"
+$jar = Join-Path $Root "target\shashu-sdk-1.2.0.jar"
+$src = Join-Path $Root "target\shashu-sdk-1.2.0-sources.jar"
+$jdoc = Join-Path $Root "target\shashu-sdk-1.2.0-javadoc.jar"
 foreach ($p in @($jar, $src, $jdoc)) {
     if (-not (Test-Path $p)) { throw "missing $p" }
 }

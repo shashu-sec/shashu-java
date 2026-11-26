@@ -38,7 +38,7 @@ class RagContextSchemaTests {
   @DisplayName("the contract is found by walking up from the module, not vendored into it")
   void the_contract_is_read_where_it_lives() {
     assertEquals(
-        "https://trustgateai.io/contracts/rag_context.v1.schema.json",
+        "https://shashu.ai/contracts/rag_context.v1.schema.json",
         RagContextSchema.document().get("$id").asText());
   }
 
