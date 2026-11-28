@@ -19,11 +19,18 @@ import java.util.Objects;
  * JSON-encoded arguments structurally instead of relying on best-effort de-flattening of pasted
  * text. All three fields are omitted from the JSON when unset, so plain {@code (role, content)}
  * messages serialise exactly as they always have.
+ *
+ * <p>The content is either one string or an ordered list of {@link ContentPart}s (text, images,
+ * files). Build the second form with {@link #user(ContentPart, ContentPart...)} or {@link
+ * #withParts(String, List)}; {@link #content()} is then {@code null} and {@link #contentParts()}
+ * holds the parts.
  */
 public final class ChatMessage {
 
   private final String role;
-  private final String content;
+
+  /** A {@code String}, a read-only {@code List<ContentPart>}, or null; serialised as it is. */
+  private final Object content;
 
   /** Assistant-issued tool calls (OpenAI {@code tool_calls} array). */
   @JsonProperty("tool_calls")
@@ -45,20 +52,61 @@ public final class ChatMessage {
     this(role, content, null, null, null);
   }
 
-  @JsonCreator
-  /** One OpenAI-shaped chat message. */
+  /** One OpenAI-shaped chat message with text content. */
   public ChatMessage(
-      @JsonProperty("role") String role,
-      @JsonProperty("content") String content,
-      @JsonProperty("tool_calls") List<ToolCall> toolCalls,
-      @JsonProperty("tool_call_id") String toolCallId,
-      @JsonProperty("name") String name) {
+      String role, String content, List<ToolCall> toolCalls, String toolCallId, String name) {
+    this((Object) content, role, toolCalls, toolCallId, name);
+  }
+
+  // Content comes first so this cannot collide with the public String constructor.
+  private ChatMessage(
+      Object content, String role, List<ToolCall> toolCalls, String toolCallId, String name) {
     this.role = role;
     this.content = content;
     this.toolCalls =
         toolCalls != null ? Collections.unmodifiableList(new ArrayList<>(toolCalls)) : null;
     this.toolCallId = toolCallId;
     this.name = name;
+  }
+
+  @JsonCreator
+  static ChatMessage fromWire(
+      @JsonProperty("role") String role,
+      @JsonProperty("content") Object content,
+      @JsonProperty("tool_calls") List<ToolCall> toolCalls,
+      @JsonProperty("tool_call_id") String toolCallId,
+      @JsonProperty("name") String name) {
+    Object value;
+    if (content == null || content instanceof String) {
+      value = content;
+    } else if (content instanceof List<?> list) {
+      value = list.stream().map(ContentPart::fromWire).toList();
+    } else if (content instanceof Number || content instanceof Boolean) {
+      value = content.toString();
+    } else {
+      throw new IllegalArgumentException("content must be a string or an array of parts");
+    }
+    return new ChatMessage(value, role, toolCalls, toolCallId, name);
+  }
+
+  /**
+   * A message whose content is an ordered list of parts. The list is copied and must hold at least
+   * one part.
+   */
+  public static ChatMessage withParts(String role, List<ContentPart> parts) {
+    List<ContentPart> copy = List.copyOf(Objects.requireNonNull(parts, "parts"));
+    if (copy.isEmpty()) {
+      throw new IllegalArgumentException("parts must not be empty");
+    }
+    return new ChatMessage((Object) copy, role, null, null, null);
+  }
+
+  /** A user-role message made of parts, e.g. a question and the document it is about. */
+  public static ChatMessage user(ContentPart first, ContentPart... rest) {
+    List<ContentPart> parts = new ArrayList<>(1 + rest.length);
+    parts.add(first);
+    Collections.addAll(parts, rest);
+    return withParts("user", parts);
   }
 
   /** A system-role message. */
@@ -96,9 +144,15 @@ public final class ChatMessage {
     return role;
   }
 
-  /** Message or delta text. */
+  /** The text content; {@code null} when there is none or the message carries parts. */
   public String content() {
-    return content;
+    return content instanceof String text ? text : null;
+  }
+
+  /** The content parts, read-only; {@code null} unless the content is a list of parts. */
+  @SuppressWarnings("unchecked") // Both construction paths store only List<ContentPart>.
+  public List<ContentPart> contentParts() {
+    return content instanceof List<?> list ? (List<ContentPart>) list : null;
   }
 
   /** Tool calls on an assistant message, if any. */

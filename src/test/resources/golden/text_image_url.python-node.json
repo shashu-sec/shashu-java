@@ -1,0 +1,1 @@
+{"model":"gpt-4o-mini","messages":[{"role":"system","content":"sys"},{"role":"user","content":[{"type":"text","text":"look"},{"type":"image_url","image_url":{"url":"https://example.com/a+b.png?x=1&y=%20"}}]}]}

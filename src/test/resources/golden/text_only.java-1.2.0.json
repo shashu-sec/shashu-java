@@ -1,0 +1,1 @@
+{"model":"gpt-4o-mini","messages":[{"role":"system","content":"sys"},{"role":"user","content":"Résumé — a+b <x> & 'q' \"d\" / \\ \uD83D\uDE00\n\tend \u001F"},{"role":"assistant","content":null,"tool_calls":[{"id":"c1","type":"function","function":{"name":"f","arguments":"{\"a\":1}"}}]},{"role":"tool","content":"r","tool_call_id":"c1","name":"f"}]}

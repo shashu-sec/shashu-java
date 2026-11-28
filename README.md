@@ -15,12 +15,12 @@ After this first mention, this document says **SHASHU**.
 <dependency>
   <groupId>ai.shashu</groupId>
   <artifactId>shashu-sdk</artifactId>
-  <version>1.0.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
 ```groovy
-implementation 'ai.shashu:shashu-sdk:1.0.0'
+implementation 'ai.shashu:shashu-sdk:1.3.0'
 ```
 
 Requires **Java 17** or later (tested on 17 and 21).
@@ -58,6 +58,54 @@ Give either a key or a token provider, not both. Environment fallbacks:
 `SHASHU_API_KEY` / `SHASHU_BASE_URL`, then `SHASHU_API_KEY` /
 `SHASHU_BASE_URL`.
 
+## Send a file or image
+
+A message can carry an ordered list of parts instead of one string. The SDK does
+the base64 encoding.
+
+```java
+byte[] statement = Files.readAllBytes(Path.of("statement.pdf"));
+try (ShashuClient client = ShashuClient.builder()
+        .baseUrl("https://gw.shashu.example")
+        .apiKey("shashu_sk_…")
+        .build()) {
+    var response = client.chat().completions().create(
+        ChatCompletionRequest.builder()
+            .model("gpt-4o")
+            .addMessage(ChatMessage.user(
+                ContentPart.text("Summarise this statement."),
+                ContentPart.file(statement, "statement.pdf", "application/pdf")))
+            .build());
+    System.out.println(response.choices().get(0).message().content());
+}
+```
+
+`ContentPart.imageData(bytes, "image/png")` attaches an image from bytes and
+`ContentPart.imageUrl(url)` refers to one by URL. To build the list yourself, use
+`ChatMessage.withParts("user", parts)`.
+
+Your gateway decides which file types and sizes it accepts and what it does with
+a file it will not pass; the SDK adds no limits. A refusal arrives as the same
+exceptions as any other.
+
+## One trace for a run of calls
+
+Each call made outside a span starts its own trace. To keep a run of calls (a
+conversation, an agent run) in one trace, make them inside `Tracer.span()`
+(`ai.shashu.sdk.tracing.Tracer`):
+
+```java
+try (Tracer.SpanHandle run = Tracer.span("support-conversation")) {
+    client.chat().completions().create(turn1);
+    client.chat().completions().create(turn2);
+}
+```
+
+Every call inside the block sends the same `x-shashu-trace-id`. The span
+belongs to the thread that opened it. Trace ids the SDK creates are 32
+lowercase hex characters. A trace id you bring in, for example from an incoming
+request with `Tracer.incoming(headers)`, is sent unchanged.
+
 ## Pass refusals
 
 A cloud pass is a JWT sent as `Authorization: Bearer`. On HTTP 401 the SDK
@@ -86,7 +134,7 @@ Constants live on `Shashu` / `PassCodes`.
 | `.baseUrl(String)` | **none** | `SHASHU_BASE_URL` |
 | `.timeoutMillis(long)` | 60_000 | — |
 | `.maxRetries(int)` | 2 | — |
-| `.userAgent(String)` | `shashu-java/1.0.0` | — |
+| `.userAgent(String)` | `shashu-java/1.3.0` | — |
 
 `SHASHU_DISABLE=1` makes the retrieval, routing and tracer surfaces no-ops.
 

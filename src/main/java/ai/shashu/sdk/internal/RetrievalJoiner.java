@@ -30,10 +30,11 @@ import okio.Buffer;
  *       deferred: a declaration that lost this call must not turn up on the next one.
  *   <li><b>Snapshot and clear.</b> The bus is emptied the moment it is written to a request.
  *       Retrieval declared for request N never reaches request N+1.
- *   <li><b>Never corrupt a body it does not understand.</b> A non-JSON body, a non-object JSON
- *       body, a duplex/one-shot body or an oversized upload is passed through untouched and does
- *       NOT consume the bus &mdash; the next real model call still carries the declaration, and a
- *       multi-gigabyte file upload does not eat it.
+ *   <li><b>Never corrupt a body it does not understand.</b> A non-JSON body, a non-object JSON body
+ *       or a duplex/one-shot body is passed through untouched and does NOT consume the bus &mdash;
+ *       the next real model call still carries the declaration, and a file upload does not eat it.
+ *       A JSON body is joined whatever its size, as in the Python and Node SDKs: a chat request
+ *       carrying a large file is still the call the declaration was made for.
  *   <li><b>A declaration that could not be attached is audible.</b> Java is the one language where
  *       the hand-off loses the declaration outright, so when this joiner attaches nothing while a
  *       declaration is sitting unconsumed on another thread, that is reported to the customer's own
@@ -49,13 +50,6 @@ public final class RetrievalJoiner {
 
   private static final Logger LOG = System.getLogger(RetrievalJoiner.class.getName());
   private static final ObjectMapper MAPPER = new ObjectMapper();
-
-  /**
-   * A body larger than this is passed through untouched. Buffering an arbitrary upload to look for
-   * a JSON object is the kind of hidden cost an instrumentation layer must not impose; a chat
-   * completion is orders of magnitude below it.
-   */
-  private static final long MAX_BODY_BYTES = 8L * 1024 * 1024;
 
   /**
    * Return the request to send: either {@code request} itself, or a copy carrying {@code
@@ -106,14 +100,9 @@ public final class RetrievalJoiner {
     if (!looksLikeJson(body.contentType())) {
       return request;
     }
-    long declared = body.contentLength();
-    if (declared > MAX_BODY_BYTES) {
-      return request;
-    }
-
     Buffer buffer = new Buffer();
     body.writeTo(buffer);
-    if (buffer.size() == 0L || buffer.size() > MAX_BODY_BYTES) {
+    if (buffer.size() == 0L) {
       return request;
     }
     byte[] raw = buffer.readByteArray();

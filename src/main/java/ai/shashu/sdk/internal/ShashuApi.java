@@ -182,23 +182,30 @@ public final class ShashuApi {
     }
   }
 
-  /** Join declareRetrieval onto the payload ONCE, before the retry loop re-sends it. */
+  /**
+   * Join declareRetrieval onto the payload ONCE, before the retry loop re-sends it. Whatever this
+   * thread declared belongs to this call alone: if it could not be attached it is dropped here, so
+   * it can never ride on a later call.
+   */
   private byte[] joinDeclarationOnce(String url, byte[] payload) {
-    Request probe = new Request.Builder().url(url).post(RequestBody.create(payload, JSON)).build();
-    Request joined = RetrievalJoiner.join(probe);
-    if (joined == probe) {
-      return payload;
-    }
-    RequestBody body = joined.body();
-    if (body == null) {
-      return payload;
-    }
     try {
+      Request probe =
+          new Request.Builder().url(url).post(RequestBody.create(payload, JSON)).build();
+      Request joined = RetrievalJoiner.join(probe);
+      if (joined == probe) {
+        return payload;
+      }
+      RequestBody body = joined.body();
+      if (body == null) {
+        return payload;
+      }
       Buffer buf = new Buffer();
       body.writeTo(buf);
       return buf.readByteArray();
     } catch (IOException e) {
       return payload;
+    } finally {
+      RetrievalBus.clearForRequest();
     }
   }
 
@@ -413,6 +420,7 @@ public final class ShashuApi {
     } catch (IOException e) {
       throw new ShashuException("Failed to serialise streaming request body", e);
     }
+    payload = joinDeclarationOnce(url, payload);
 
     Request.Builder req =
         new Request.Builder()

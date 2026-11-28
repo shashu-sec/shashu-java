@@ -2,6 +2,20 @@
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] — 2026-11-27
+
+Added: messages can carry text, image and file parts, the same format as the
+Python and Node SDKs.
+
+Fixed: the retrieval declaration is now attached to large requests too, and is
+never carried over to another request.
+
+`ChatMessage.user(ContentPart...)`, `ChatMessage.withParts(role, parts)`,
+`ContentPart` and `contentParts()` are new. Existing text-only code compiles and
+sends the same bytes as 1.2.0. A reply whose content is a list of parts is now
+read (`content()` is `null`, `contentParts()` holds them) instead of failing to
+parse.
+
 ## [1.2.0] — 2026-11-26
 
 BREAKING: framework state keys are now `shashu_session_id` / `shashu_trace_id`.
